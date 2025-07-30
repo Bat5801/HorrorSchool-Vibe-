@@ -85,6 +85,12 @@ body {
     border-color: #444;
 }
 
+.chapter-item .lock-icon {
+    display: inline-block;
+    margin-left: 0.5rem;
+    color: #555;
+}
+
 .chapter-item h2 {
     color: #ff9999;
     margin-bottom: 0.5rem;

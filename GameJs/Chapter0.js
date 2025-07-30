@@ -5,11 +5,13 @@ class SchoolHorrorGame {
             playerName: '',
             playerGender: '',
             currentScene: 'start',
+            currentChapter: '',
             gameTime: '21:00',
             plotProgress: 0,
             inventory: [],
             hasKey: false,
-            hasSeenGhost: false
+            hasSeenGhost: false,
+            unlockedChapters: ['prologue'] // 默认解锁序幕
         };
 
         // DOM元素
@@ -92,6 +94,9 @@ class SchoolHorrorGame {
 
     // 开始游戏
     startGame(chapter) {
+        // 设置当前章节
+        this.gameState.currentChapter = chapter;
+        
         // 更新玩家信息显示
         this.elements.playerNameDisplay.textContent = this.gameState.playerName;
         this.elements.playerGenderDisplay.textContent = this.gameState.playerGender === 'male' ? '男' : '女';
@@ -100,8 +105,41 @@ class SchoolHorrorGame {
         this.elements.chapterSelectScreen.classList.add('hidden');
         this.elements.gameScreen.classList.remove('hidden');
 
-        // 初始化第一个场景
-        this.loadScene('classroom');
+        // 根据章节初始化第一个场景
+        if (chapter === 'prologue') {
+            this.loadScene('classroom');
+        } else if (chapter === 'chapter1') {
+            // 加载Chapter1的起始场景
+            if (window.Chapter1) {
+                this.chapter1 = new Chapter1(this);
+                this.chapter1.start();
+            } else {
+                this.showDialogue('无法加载第一章内容，请确保Chapter1.js已正确加载。', [
+                    { text: '返回章节选择', action: () => this.returnToChapterSelect() }
+                ]);
+            }
+        }
+    }
+
+    // 解锁章节
+    unlockChapter(chapter) {
+        if (!this.gameState.unlockedChapters.includes(chapter)) {
+            this.gameState.unlockedChapters.push(chapter);
+            // 更新章节选择界面
+            this.updateChapterAvailability();
+        }
+    }
+
+    // 更新章节可用性
+    updateChapterAvailability() {
+        document.querySelectorAll('.chapter-item').forEach(item => {
+            const chapter = item.dataset.chapter;
+            if (this.gameState.unlockedChapters.includes(chapter)) {
+                item.classList.remove('locked');
+                item.classList.add('available');
+                item.querySelector('.lock-icon').style.display = 'none';
+            }
+        });
     }
 
     // 加载场景
@@ -350,10 +388,33 @@ class SchoolHorrorGame {
         ]);
     }
 
+   // 显示死亡
     showDeath(message) {
         this.elements.gameScreen.classList.add('hidden');
         this.elements.deathScreen.classList.remove('hidden');
         this.elements.deathMessage.textContent = message;
+    }
+
+    // 完成章节
+    completeChapter() {
+        if (this.gameState.currentChapter === 'prologue') {
+            // 解锁第一章
+            this.unlockChapter('chapter1');
+            this.showDialogue('恭喜你完成了序幕！第一章"初见幽凄"已解锁。', [
+                { text: '返回章节选择', action: () => this.returnToChapterSelect() }
+            ]);
+        } else if (this.gameState.currentChapter === 'chapter1') {
+            // 可以在这里添加解锁第二章的逻辑
+            this.showDialogue('恭喜你完成了第一章！更多章节即将解锁...', [
+                { text: '返回章节选择', action: () => this.returnToChapterSelect() }
+            ]);
+        }
+    }
+
+    // 返回章节选择
+    returnToChapterSelect() {
+        this.elements.gameScreen.classList.add('hidden');
+        this.elements.chapterSelectScreen.classList.remove('hidden');
     }
 
     restartGame() {
