@@ -15,6 +15,7 @@ class SchoolHorrorGame {
         // DOM元素
         this.elements = {
             startScreen: document.getElementById('start-screen'),
+            chapterSelectScreen: document.getElementById('chapter-select-screen'),
             gameScreen: document.getElementById('game-screen'),
             deathScreen: document.getElementById('death-screen'),
             playerNameInput: document.getElementById('player-name'),
@@ -59,10 +60,25 @@ class SchoolHorrorGame {
         });
 
         // 开始游戏按钮
-        this.elements.startButton.addEventListener('click', () => this.startGame());
+        this.elements.startButton.addEventListener('click', () => {
+            this.elements.startScreen.classList.add('hidden');
+            this.elements.chapterSelectScreen.classList.remove('hidden');
+        });
 
         // 重新开始按钮
         this.elements.restartButton.addEventListener('click', () => this.restartGame());
+
+        // 章节选择事件
+        document.querySelectorAll('.chapter-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (item.classList.contains('available')) {
+                    const chapter = item.dataset.chapter;
+                    this.startGame(chapter);
+                } else {
+                    alert('你还没有解锁该关卡');
+                }
+            });
+        });
     }
 
     // 检查开始游戏条件
@@ -75,13 +91,13 @@ class SchoolHorrorGame {
     }
 
     // 开始游戏
-    startGame() {
+    startGame(chapter) {
         // 更新玩家信息显示
         this.elements.playerNameDisplay.textContent = this.gameState.playerName;
         this.elements.playerGenderDisplay.textContent = this.gameState.playerGender === 'male' ? '男' : '女';
 
         // 切换屏幕
-        this.elements.startScreen.classList.add('hidden');
+        this.elements.chapterSelectScreen.classList.add('hidden');
         this.elements.gameScreen.classList.remove('hidden');
 
         // 初始化第一个场景

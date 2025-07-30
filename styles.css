@@ -52,6 +52,48 @@ body {
     font-weight: bold;
 }
 
+/* 章节选择界面样式 */
+.chapter-list {
+    max-width: 600px;
+    margin: 2rem auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.chapter-item {
+    background-color: #2a2a2a;
+    padding: 1.5rem;
+    border: 2px solid #555;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.chapter-item.available {
+    border-color: #ff4d4d;
+}
+
+.chapter-item.available:hover {
+    transform: scale(1.02);
+    background-color: #333;
+}
+
+.chapter-item.locked {
+    opacity: 0.7;
+    cursor: not-allowed;
+    border-color: #444;
+}
+
+.chapter-item h2 {
+    color: #ff9999;
+    margin-bottom: 0.5rem;
+}
+
+.chapter-item p {
+    color: #999;
+}
+
 /* 开始界面样式 */
 .start-options {
     max-width: 400px;
