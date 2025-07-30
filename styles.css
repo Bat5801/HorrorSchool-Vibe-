@@ -1,0 +1,274 @@
+/* 基础样式与重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+body {
+    background-color: #0a0a0a;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 游戏容器 */
+#game-container {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    border: 4px solid #333;
+    background-color: #1a1a1a;
+    overflow: hidden;
+}
+
+/* 屏幕通用样式 */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 2rem;
+    transition: opacity 0.5s ease;
+}
+
+.hidden {
+    display: none;
+}
+
+/* 像素风格标题 */
+.pixel-title {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #ff4d4d;
+    text-shadow: 4px 4px 0 #000;
+    letter-spacing: 5px;
+    font-weight: bold;
+}
+
+/* 开始界面样式 */
+.start-options {
+    max-width: 400px;
+    margin: 0 auto;
+    background-color: #2a2a2a;
+    padding: 2rem;
+    border: 2px solid #555;
+    border-radius: 8px;
+}
+
+.name-input {
+    margin-bottom: 1.5rem;
+}
+
+.name-input label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #ff9999;
+}
+
+.name-input input {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #1a1a1a;
+    border: 2px solid #555;
+    color: #fff;
+    font-size: 1rem;
+    border-radius: 4px;
+}
+
+.gender-selection {
+    margin-bottom: 1.5rem;
+}
+
+.gender-selection p {
+    margin-bottom: 0.5rem;
+    color: #ff9999;
+}
+
+.gender-options {
+    display: flex;
+    gap: 1rem;
+}
+
+.gender-btn {
+    flex: 1;
+    padding: 0.8rem;
+    background-color: #333;
+    border: 2px solid #555;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gender-btn:hover {
+    background-color: #555;
+}
+
+.gender-btn.selected {
+    background-color: #ff4d4d;
+    border-color: #ff1a1a;
+}
+
+.start-btn {
+    width: 100%;
+    padding: 1rem;
+    background-color: #ff4d4d;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.start-btn:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+
+.start-btn:hover:not(:disabled) {
+    background-color: #ff1a1a;
+    transform: scale(1.05);
+}
+
+.game-description {
+    margin-top: 2rem;
+    text-align: center;
+    color: #999;
+    line-height: 1.6;
+}
+
+/* 游戏界面样式 */
+#game-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background-color: #222;
+    border-bottom: 2px solid #444;
+}
+
+#game-map {
+    height: calc(100% - 180px);
+    background-color: #111;
+    position: relative;
+    overflow: hidden;
+}
+
+#game-dialogue {
+    height: 120px;
+    background-color: #222;
+    border-top: 2px solid #444;
+    padding: 1rem;
+}
+
+#dialogue-text {
+    margin-bottom: 1rem;
+    color: #ddd;
+}
+
+#dialogue-choices {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.choice-btn {
+    padding: 0.5rem 1rem;
+    background-color: #333;
+    border: 1px solid #555;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.choice-btn:hover {
+    background-color: #555;
+}
+
+/* 死亡界面样式 */
+#death-screen {
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.death-title {
+    font-size: 2.5rem;
+    color: #ff4d4d;
+    margin-bottom: 2rem;
+    text-shadow: 4px 4px 0 #000;
+}
+
+#death-message {
+    font-size: 1.2rem;
+    color: #ff9999;
+    margin-bottom: 2rem;
+    text-align: center;
+    max-width: 500px;
+}
+
+.restart-btn {
+    padding: 1rem 2rem;
+    background-color: #ff4d4d;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.restart-btn:hover {
+    background-color: #ff1a1a;
+    transform: scale(1.05);
+}
+
+/* 像素化效果 */
+.pixel-title, .death-title {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.pixel-map {
+    font-family: 'Courier New', Courier, monospace;
+    color: #fff;
+    line-height: 1;
+    white-space: pre;
+    font-size: 12px;
+    letter-spacing: 0;
+}
+
+/* 隐藏屏幕 */
+.hidden {
+    display: none !important;
+}
+
+/* 动画效果 */
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+.flicker {
+    animation: flicker 0.5s infinite;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.shake {
+    animation: shake 0.5s infinite;
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园惊魂 | 像素恐怖游戏</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- 开始界面 -->
+        <div id="start-screen" class="screen">
+            <h1 class="pixel-title">校园惊魂</h1>
+            <div class="start-options">
+                <div class="name-input">
+                    <label for="player-name">你的名字:</label>
+                    <input type="text" id="player-name" placeholder="输入你的名字...">
+                </div>
+                <div class="gender-selection">
+                    <p>选择性别:</p>
+                    <div class="gender-options">
+                        <button id="male-option" class="gender-btn">男</button>
+                        <button id="female-option" class="gender-btn">女</button>
+                    </div>
+                </div>
+                <button id="start-game" class="start-btn" disabled>开始游戏</button>
+            </div>
+            <div class="game-description">
+                <p>在一个普通的晚自习后，你发现自己被困在了学校里...</p>
+                <p>随着夜幕降临，校园里开始发生诡异的事情...</p>
+            </div>
+        </div>
+
+        <!-- 游戏界面 -->
+        <div id="game-screen" class="screen hidden">
+            <div id="game-header">
+                <div id="player-info">
+                    <span id="player-name-display"></span> | <span id="player-gender-display"></span>
+                </div>
+                <div id="game-time">时间: <span id="current-time">21:00</span></div>
+            </div>
+            <div id="game-map"></div>
+            <div id="game-actions"></div>
+            <div id="game-dialogue">
+                <div id="dialogue-text"></div>
+                <div id="dialogue-choices"></div>
+            </div>
+        </div>
+
+        <!-- 死亡界面 -->
+        <div id="death-screen" class="screen hidden">
+            <h2 class="death-title">你遭遇了不幸...</h2>
+            <div id="death-message"></div>
+            <button id="restart-game" class="restart-btn">重新开始</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
