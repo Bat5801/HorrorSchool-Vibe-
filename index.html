@@ -36,7 +36,7 @@
             <h1 class="pixel-title">选择章节</h1>
             <div class="chapter-list">
                 <div class="chapter-item available" data-chapter="prologue">
-                    <h2>序幕-「晚自习后」</h2>
+                    <h2>序章-「晚自习后」</h2>
                     <p>在一个普通的晚自习后，你发现自己被困在了学校里...</p>
                 </div>
                 <div class="chapter-item locked" data-chapter="chapter1">
@@ -67,6 +67,19 @@
             <h2 class="death-title">你遭遇了不幸...</h2>
             <div id="death-message"></div>
             <button id="restart-game" class="restart-btn">重新开始</button>
+        </div>
+
+        <!-- 结算界面 -->
+        <div id="result-screen" class="screen hidden">
+            <h1 class="pixel-title">恭喜通关!</h1>
+            <div class="result-info">
+                <p>章节: <span id="result-chapter"></span></p>
+                <p>通关时间: <span id="result-time"></span></p>
+            </div>
+            <div class="result-actions">
+                <button id="next-chapter-btn" class="start-btn">下一章</button>
+                <button id="back-to-chapter-select" class="restart-btn">返回章节选择</button>
+            </div>
         </div>
     </div>
 

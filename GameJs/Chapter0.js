@@ -11,7 +11,7 @@ class SchoolHorrorGame {
             inventory: [],
             hasKey: false,
             hasSeenGhost: false,
-            unlockedChapters: ['prologue'] // 默认解锁序幕
+            unlockedChapters: ['prologue'] // 默认解锁序章
         };
 
         // DOM元素
@@ -20,19 +20,29 @@ class SchoolHorrorGame {
             chapterSelectScreen: document.getElementById('chapter-select-screen'),
             gameScreen: document.getElementById('game-screen'),
             deathScreen: document.getElementById('death-screen'),
+            resultScreen: document.getElementById('result-screen'),
             playerNameInput: document.getElementById('player-name'),
             maleOption: document.getElementById('male-option'),
             femaleOption: document.getElementById('female-option'),
             startButton: document.getElementById('start-game'),
             restartButton: document.getElementById('restart-game'),
+            nextChapterBtn: document.getElementById('next-chapter-btn'),
+            backToChapterSelectBtn: document.getElementById('back-to-chapter-select'),
+            currentTimeDisplay: document.getElementById('current-time'),
             playerNameDisplay: document.getElementById('player-name-display'),
             playerGenderDisplay: document.getElementById('player-gender-display'),
-            currentTimeDisplay: document.getElementById('current-time'),
             gameMap: document.getElementById('game-map'),
+            gameActions: document.getElementById('game-actions'),
             dialogueText: document.getElementById('dialogue-text'),
             dialogueChoices: document.getElementById('dialogue-choices'),
-            deathMessage: document.getElementById('death-message')
+            deathMessage: document.getElementById('death-message'),
+            resultChapter: document.getElementById('result-chapter'),
+            resultTime: document.getElementById('result-time')
         };
+
+        // 绑定结算画面按钮事件
+        this.elements.nextChapterBtn.addEventListener('click', () => this.goToNextChapter());
+        this.elements.backToChapterSelectBtn.addEventListener('click', () => this.returnToChapterSelect());
 
         // 绑定事件监听
         this.bindEvents();
@@ -137,7 +147,17 @@ class SchoolHorrorGame {
             if (this.gameState.unlockedChapters.includes(chapter)) {
                 item.classList.remove('locked');
                 item.classList.add('available');
-                item.querySelector('.lock-icon').style.display = 'none';
+                const lockIcon = item.querySelector('.lock-icon');
+                const chapterDesc = item.querySelector('.chapter-description');
+                if (lockIcon) {
+                    lockIcon.style.display = 'none';
+                }
+                if (chapterDesc) {
+                    if (chapter === 'chapter1') {
+                        chapterDesc.textContent = '第一章：探索学校的神秘事件，解开隐藏的秘密。';
+                    }
+                    // 可以添加更多章节的描述更新
+                }
             }
         });
     }
@@ -249,10 +269,13 @@ class SchoolHorrorGame {
             corridor: '🚪 学校走廊',
             library: '📚 图书馆',
             bathroom: '🚻 卫生间',
-            principalOffice: '🔑 校长办公室'
+            principalOffice: '🔑 校长办公室',
+            staircase: '🔺 楼梯间',
+            artRoom: '🎨 美术教室',
+            basement: '🔻 地下室'
         };
 
-        this.elements.gameMap.innerHTML = `<div class="location-name">${locations[location]}</div>
+        this.elements.gameMap.innerHTML = `<div class="location-name">${locations[location] || '未知地点'}</div>
 <div class="pixel-map">${this.generatePixelMap(location)}</div>`;
     }
 
@@ -269,6 +292,12 @@ class SchoolHorrorGame {
                 return '■■■■■■\n■   S   ■\n■       ■\n■   M   ■\n■■■■■■';
             case 'principalOffice':
                 return '■■■■■■■■\n■   D    ■\n■        ■\n■   F    ■\n■■■■■■■■';
+            case 'staircase':
+                return '■■■■■\n■  ▲  ■\n■  ▲  ■\n■  ▲  ■\n■  ▼  ■\n■  ▼  ■\n■  ▼  ■\n■■■■■';
+            case 'artRoom':
+                return '■■■■■■■■■■\n■ P     P ■\n■         ■\n■   E     ■\n■         ■\n■ P     P ■\n■■■■■■■■■■';
+            case 'basement':
+                return '■■■■■■■■■■\n■   D     ■\n■         ■\n■   S     ■\n■         ■\n■   C     ■\n■■■■■■■■■■';
             default:
                 return '■■■■■■■■\n■   ?    ■\n■        ■\n■■■■■■■■';
         }
@@ -396,24 +425,56 @@ class SchoolHorrorGame {
     }
 
     // 完成章节
-    completeChapter() {
+    // 显示结算画面
+    showResultScreen() {
+        this.elements.gameScreen.classList.add('hidden');
+        this.elements.resultScreen.classList.remove('hidden');
+        
+        // 显示章节名称和通关时间
+        let chapterName = '';
         if (this.gameState.currentChapter === 'prologue') {
-            // 解锁第一章
-            this.unlockChapter('chapter1');
-            this.showDialogue('恭喜你完成了序幕！第一章"初见幽凄"已解锁。', [
-                { text: '返回章节选择', action: () => this.returnToChapterSelect() }
-            ]);
+            chapterName = '序章-「晚自习后」';
         } else if (this.gameState.currentChapter === 'chapter1') {
-            // 可以在这里添加解锁第二章的逻辑
-            this.showDialogue('恭喜你完成了第一章！更多章节即将解锁...', [
+            chapterName = '第一章-「初见幽凄」';
+        }
+        
+        this.elements.resultChapter.textContent = chapterName;
+        this.elements.resultTime.textContent = this.gameState.gameTime;
+    }
+
+    // 进入下一章
+    goToNextChapter() {
+        if (this.gameState.currentChapter === 'prologue') {
+            this.startGame('chapter1');
+        } else if (this.gameState.currentChapter === 'chapter1') {
+            // 这里可以添加第二章的逻辑
+            this.showDialogue('第二章尚未解锁，敬请期待...', [
                 { text: '返回章节选择', action: () => this.returnToChapterSelect() }
             ]);
         }
     }
 
+    completeChapter() {
+        if (this.gameState.currentChapter === 'prologue') {
+            // 检查unlockedChapters是否存在，如果不存在则初始化
+            if (!this.gameState.unlockedChapters) {
+                this.gameState.unlockedChapters = ['prologue'];
+            }
+            // 解锁第一章
+            this.unlockChapter('chapter1');
+        } else if (this.gameState.currentChapter === 'chapter1') {
+            // 可以在这里添加解锁第二章的逻辑
+        }
+        
+        // 显示结算画面
+        this.showResultScreen();
+    }
+
     // 返回章节选择
     returnToChapterSelect() {
         this.elements.gameScreen.classList.add('hidden');
+        this.elements.deathScreen.classList.add('hidden');
+        this.elements.resultScreen.classList.add('hidden');
         this.elements.chapterSelectScreen.classList.remove('hidden');
     }
 
@@ -423,11 +484,13 @@ class SchoolHorrorGame {
             playerName: this.gameState.playerName,
             playerGender: this.gameState.playerGender,
             currentScene: 'start',
+            currentChapter: '',
             gameTime: '21:00',
             plotProgress: 0,
             inventory: [],
             hasKey: false,
-            hasSeenGhost: false
+            hasSeenGhost: false,
+            unlockedChapters: ['prologue'] // 默认解锁序章
         };
 
         // 重置界面
@@ -467,7 +530,7 @@ class SchoolHorrorGame {
     closeDiary() { this.showDialogue('你合上日记，决定寻找离开学校的方法。', [{ text: '离开办公室', action: () => this.goToCorridor() }]); }
     findExit() { this.showDialogue('根据日记的线索，你找到了学校的侧门！', [{ text: '尝试开门', action: () => this.trySideDoor() }]); }
     trySideDoor() { this.showDialogue('门没有锁！你成功逃出了学校！', [{ text: '游戏结束', action: () => this.gameClear() }]); }
-    gameClear() { alert('恭喜你成功逃脱！但这所学校的秘密还没有解开...'); this.restartGame(); }
+    gameClear() { this.completeChapter(); }
 }
 
 // 游戏初始化

@@ -208,7 +208,5 @@ class Chapter1 {
     }
 }
 
-// 导出Chapter1类，以便在主游戏中使用
-if (typeof module !== 'undefined') {
-    module.exports = Chapter1;
-}
+// 导出Chapter1类到window对象，以便在主游戏中使用
+window.Chapter1 = Chapter1;
