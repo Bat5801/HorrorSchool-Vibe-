@@ -444,6 +444,9 @@ class SchoolHorrorGame {
 
     // 进入下一章
     goToNextChapter() {
+        // 隐藏结算页面
+        this.elements.resultScreen.classList.add('hidden');
+        
         if (this.gameState.currentChapter === 'prologue') {
             this.startGame('chapter1');
         } else if (this.gameState.currentChapter === 'chapter1') {
