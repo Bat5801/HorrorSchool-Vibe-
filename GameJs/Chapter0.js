@@ -157,16 +157,26 @@ class SchoolHorrorGame {
                 ]);
             }
         } else if (chapter === 'chapter2') {
-            // 加载Chapter2的起始场景
-            if (window.Chapter2) {
-                this.chapter2 = new Chapter2(this);
-                this.chapter2.start();
-            } else {
-                this.showDialogue('无法加载第二章内容，请确保Chapter2.js已正确加载。', [
-                    { text: '返回章节选择', action: () => this.returnToChapterSelect() }
-                ]);
+                // 加载Chapter2的起始场景
+                if (window.Chapter2) {
+                    this.chapter2 = new Chapter2(this);
+                    this.chapter2.start();
+                } else {
+                    this.showDialogue('无法加载第二章内容，请确保Chapter2.js已正确加载。', [
+                        { text: '返回章节选择', action: () => this.returnToChapterSelect() }
+                    ]);
+                }
+            } else if (chapter === 'chapter3') {
+                // 加载Chapter3的起始场景
+                if (window.Chapter3) {
+                    this.chapter3 = new Chapter3(this);
+                    this.chapter3.start();
+                } else {
+                    this.showDialogue('无法加载第三章内容，请确保Chapter3.js已正确加载。', [
+                        { text: '返回章节选择', action: () => this.returnToChapterSelect() }
+                    ]);
+                }
             }
-        }
     }
 
     // 解锁章节
@@ -336,7 +346,12 @@ class SchoolHorrorGame {
             quadrangle: '🏫 校园广场',
             dormitory: '🏠 宿舍区',
             canteen: '🍽️ 食堂',
-            storageRoom: '🔒 仓库'
+            storageRoom: '🔒 仓库',
+            schoolGate: '🚪 学校大门',
+            foyer: '🏫 教学楼大厅',
+            abandonedWing: '🏚️ 废弃教学楼',
+            labyrinth: '🌀 地下迷宫',
+            altarRoom: '🩸 祭坛房间'
         };
         
         this.elements.gameMap.innerHTML = `<div class="location-name">${locations[location] || '未知地点'}</div>
@@ -345,6 +360,39 @@ class SchoolHorrorGame {
 
     // 生成像素风格地图
     generatePixelMap(location) {
+        // 为第三章场景添加像素地图
+        if (location === 'schoolGate') {
+            return `■■■■■■■■■■
+■   ■■■   ■
+■  ■   ■  ■
+■   ■■■   ■
+■■■■■■■■■■`;
+        } else if (location === 'foyer') {
+            return `■■■■■■■■■■
+■  ■     ■ ■
+■  ■  ■  ■ ■
+■  ■     ■ ■
+■■■■■■■■■■`;
+        } else if (location === 'abandonedWing') {
+            return `■■■■■■■■■■
+■ ▒▒▒ ▒▒▒ ■
+■         ■
+■ ▒▒▒ ▒▒▒ ■
+■■■■■■■■■■`;
+        } else if (location === 'labyrinth') {
+            return `■■■■■■■■■■
+■ ■ ■ ■ ■ ■
+■■■■■■■■■■
+■ ■ ■ ■ ■ ■
+■■■■■■■■■■`;
+        } else if (location === 'altarRoom') {
+            return `■■■■■■■■■■
+■         ■
+■   ■■■   ■
+■  ■   ■  ■
+■■■■■■■■■■`;
+        }
+        
         switch(location) {
             case 'classroom':
                 return '■■■■■■■■■■\n■         ■\n■   T     ■\n■         ■\n■   C     ■\n■         ■\n■■■■■■■■■■';
@@ -584,6 +632,10 @@ class SchoolHorrorGame {
             this.elements.nextChapterBtn.classList.remove('hidden');
         } else if (this.gameState.currentChapter === 'chapter2') {
             chapterName = '第二章-「深入诡域」';
+            // 显示下一章按钮
+            this.elements.nextChapterBtn.classList.remove('hidden');
+        } else if (this.gameState.currentChapter === 'chapter3') {
+            chapterName = '第三章-「宿命终结」';
         }
         
         this.elements.resultChapter.textContent = chapterName;
@@ -619,6 +671,9 @@ class SchoolHorrorGame {
         } else if (this.gameState.currentChapter === 'chapter1') {
             // 解锁第二章
             this.unlockChapter('chapter2');
+        } else if (this.gameState.currentChapter === 'chapter2') {
+            // 解锁第三章
+            this.unlockChapter('chapter3');
         }
     
         // 显示结算画面
