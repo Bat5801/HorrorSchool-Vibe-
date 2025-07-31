@@ -283,7 +283,10 @@ ${this.getPronoun('subject')}生气地摔门而出，留下你一个人在宿舍
     }
 
     useMysteriousKey() {
-        if (this.mysteriousKeyFound) {
+        // 同时检查钥匙状态和物品栏，增加容错性
+        const hasKey = this.mysteriousKeyFound || this.game.gameState.inventory.includes('神秘钥匙') || this.game.gameState.inventory.includes('铜钥匙');
+        
+        if (hasKey) {
             this.showDialogue(`你掏出钥匙插入锁孔，钥匙和锁完美契合。随着"咔嗒"一声，锁开了。\n${this.friendName}松了一口气："太好了！我们快走吧！"`, [
                 { text: '离开学校', action: () => this.escapeSchool() },
                 { text: '继续探索', action: () => this.enterSchool() }
@@ -524,15 +527,26 @@ ${this.getPronoun('subject')}转身跑出仓库，照片掉在地上。你捡起
         }
     }
 
+    // 显示结算画面
+    showResultScreen() {
+        this.game.elements.gameScreen.classList.add('hidden');
+        this.game.elements.resultScreen.classList.remove('hidden');
+        
+        // 显示章节名称和通关时间
+        const chapterName = '第二章-「宿舍鬼影」';
+        this.game.elements.resultChapter.textContent = chapterName;
+        this.game.elements.resultTime.textContent = this.game.gameState.gameTime;
+        
+        // 隐藏下一章按钮（第三章尚未制作）
+        this.game.elements.nextChapterBtn.classList.add('hidden');
+    }
+
     // 完成章节
     finishChapter() {
         this.game.unlockChapter('chapter3');
-        this.showDialogue(`第二章-「宿舍鬼影」 完
-你成功离开了学校，但${this.friendName}的行为越来越可疑。那张照片、神秘的钥匙、刻着符号的徽章...这一切似乎都指向一个更大的秘密。
-下一章：废弃教学楼的阴影`, [
-            { text: '返回章节选择', action: () => this.game.returnToChapterSelect() },
-            { text: '开始第三章', action: () => this.startChapter3() }
-        ]);
+        
+        // 显示结算画面
+        this.showResultScreen();
     }
 
     startChapter3() {

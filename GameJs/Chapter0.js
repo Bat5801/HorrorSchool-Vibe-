@@ -49,12 +49,15 @@ class SchoolHorrorGame {
             dialogueChoices: document.getElementById('dialogue-choices'),
             deathMessage: document.getElementById('death-message'),
             resultChapter: document.getElementById('result-chapter'),
-            resultTime: document.getElementById('result-time')
+            resultTime: document.getElementById('result-time'),
+            backToMainBtn: document.getElementById('back-to-main')
         };
 
         // 绑定结算画面按钮事件
         this.elements.nextChapterBtn.addEventListener('click', () => this.goToNextChapter());
         this.elements.backToChapterSelectBtn.addEventListener('click', () => this.returnToChapterSelect());
+        // 绑定返回主界面按钮事件
+        this.elements.backToMainBtn.addEventListener('click', () => this.backToMainScreen());
 
         // 绑定事件监听
         this.bindEvents();
@@ -601,6 +604,10 @@ class SchoolHorrorGame {
             // 传递时间到第二章
             const endTime = this.gameState.gameTime;
             this.startGame('chapter2', endTime);
+        } else if (this.gameState.currentChapter === 'chapter2') {
+            // 传递时间到第三章
+            const endTime = this.gameState.gameTime;
+            this.startGame('chapter3', endTime);
         }
     }
 
@@ -771,6 +778,16 @@ class SchoolHorrorGame {
     trySideDoor() { this.showDialogue('门没有锁！你推开门，发现外面不是街道，而是一条昏暗的走廊，墙上挂着指向地下室的路标。', [{ text: '进入走廊', action: () => this.enterDeepCorridor() }]); }
     enterDeepCorridor() { this.gameState.inventory.push('地下室地图'); this.showDialogue('走廊尽头的墙上钉着一张泛黄的地图，标记着学校地下结构。你意识到自己正深入学校未知区域。', [{ text: '按地图探索', action: () => this.gameClear() }]); }
     gameClear() { this.completeChapter(); }
+
+    // 返回主界面
+    backToMainScreen() {
+        // 隐藏章节选择界面
+        this.elements.chapterSelectScreen.classList.add('hidden');
+        // 显示主界面
+        this.elements.startScreen.classList.remove('hidden');
+        // 重置章节选择相关状态
+        this.gameState.selectedChapter = null;
+    }
 }
 
 // 游戏初始化

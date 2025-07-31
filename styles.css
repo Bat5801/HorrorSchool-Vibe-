@@ -53,10 +53,30 @@ body {
     font-size: 2rem;
     text-align: center;
     margin-bottom: 2rem;
+    margin-top: 2rem; /* 为返回按钮留出空间 */
     color: #ff4d4d;
     text-shadow: 2px 2px 0 #000;
     letter-spacing: 2px;
     font-weight: normal;
+}
+
+/* 返回按钮样式 */
+.back-btn {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    padding: 0.8rem 1.2rem;
+    background-color: #333;
+    border: 2px solid #555;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background-color: #555;
+    border-color: #ff4d4d;
 }
 
 /* 章节选择界面样式 */
