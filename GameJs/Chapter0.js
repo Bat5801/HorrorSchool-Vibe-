@@ -154,7 +154,7 @@ class SchoolHorrorGame {
                 }
                 if (chapterDesc) {
                     if (chapter === 'chapter1') {
-                        chapterDesc.textContent = '第一章：探索学校的神秘事件，解开隐藏的秘密。';
+                        chapterDesc.textContent = '第一章：探索学校的神秘事件，解开隐藏的秘密。找到生锈的钥匙，面对镜中的幽魂，揭露校园背后的真相。';
                     }
                     // 可以添加更多章节的描述更新
                 }
@@ -528,6 +528,8 @@ class SchoolHorrorGame {
     tryDoorKey() { this.showDialogue('钥匙插进锁孔，但转不动。这时你听到身后传来脚步声...', [{ text: '转身查看', action: () => this.seeWhoIsThere() }, { text: '继续尝试开门', action: () => this.keepTryingKey() }]); }
     takeNote() { this.showDialogue('纸条上写着："它不喜欢噪音，用水可以暂时驱赶它"', [{ text: '收好纸条', action: () => this.goToCorridor() }]); }
     seeWhoIsThere() { this.showDeath('站在你身后的是一个穿着校服的学生，他的脸正在慢慢融化...'); }
+
+    checkDrawer() { this.showDialogue('你打开了抽屉，里面放着一张泛黄的纸条："不要相信镜子里的倒影"', [{ text: '关闭抽屉', action: () => this.goToCorridor() }]); }
     keepTryingKey() { this.showDeath('门锁突然转动，但门打开的瞬间，一股黑色的雾气涌了进来，吞噬了你...'); }
     continueReading() { this.showDialogue('日记最后一页写着："它在找替身，特别是在这个日子留在学校的人..."', [{ text: '寻找出口', action: () => this.findExit() }]); }
     closeDiary() { this.showDialogue('你合上日记，决定寻找离开学校的方法。', [{ text: '离开办公室', action: () => this.goToCorridor() }]); }

@@ -183,16 +183,30 @@ class Chapter1 {
     }
 
     exploreBasement() {
-        if (this.keyFound && this.ghostEncountered) {
-            this.game.showDialogue('你在地下室深处发现了一个隐藏的门，上面有一个古老的锁。你的钥匙正好能打开它！', [
-                { text: '打开门', action: () => this.openSecretDoor() },
-                { text: '返回楼梯间', action: () => this.returnToStaircase() }
-            ]);
+        if (this.keyFound) {
+            if (!this.ghostEncountered) {
+                this.game.showDialogue('你听到身后传来脚步声，一个穿着校服的女孩出现在地下室入口，她的眼睛流着血。', [
+                    { text: '逃跑', action: () => this.encounterGhost() },
+                    { text: '用钥匙对抗', action: () => this.useKeyAgainstGhost() }
+                ]);
+            } else {
+                this.game.showDialogue('你在地下室深处发现了一个隐藏的门，上面有一个古老的锁。你的钥匙正好能打开它！', [
+                    { text: '打开门', action: () => this.openSecretDoor() },
+                    { text: '返回楼梯间', action: () => this.returnToStaircase() }
+                ]);
+            }
         } else {
             this.game.showDialogue('地下室深处传来奇怪的声音，你觉得最好不要靠近。', [
                 { text: '返回楼梯间', action: () => this.returnToStaircase() }
             ]);
         }
+    }
+
+    useKeyAgainstGhost() {
+        this.ghostEncountered = true;
+        this.game.showDialogue('你用生锈的钥匙指向鬼魂，钥匙发出微弱的光芒，鬼魂后退了几步。', [
+            { text: '检查隐藏门', action: () => this.exploreBasement() }
+        ]);
     }
 
     // 打开秘密门
@@ -204,7 +218,7 @@ class Chapter1 {
 
     // 完成章节
     completeChapter() {
-        this.game.completeChapter();
+        this.game.completeChapter('chapter1');
     }
 }
 
