@@ -746,30 +746,34 @@ class Chapter1 {
         this.game.elements.resultScreen.classList.remove('hidden');
 
         // 显示章节名称和通关时间
-        const chapterName = '第一章：地下核心';
+        const chapterName = '第一章-「初见幽凄」';
         const gameTime = this.game.gameState.gameTime || '22:30'; // 默认值
 
         this.game.elements.resultChapter.textContent = chapterName;
         this.game.elements.resultTime.textContent = gameTime;
 
-        // 修改结果屏幕按钮
+        // 显示下一章按钮
         const nextChapterBtn = this.game.elements.nextChapterBtn;
-        nextChapterBtn.textContent = '返回主页';
-        nextChapterBtn.onclick = () => this.returnToMainMenu();
+        nextChapterBtn.textContent = '进入第二章';
+        nextChapterBtn.classList.remove('hidden');
+        nextChapterBtn.onclick = () => this.game.goToNextChapter();
 
-        // 隐藏或移除"下一章"提示
-        const resultMessage = this.game.elements.resultMessage;
-        resultMessage.textContent = '你成功到达了学校的地下核心区域，揭开了学校的古老秘密。但这仅仅是开始...\n\n第二章 仍在制作中，敬请期待。';
+        // 确保解锁第二章
+        setTimeout(() => {
+            this.game.unlockChapter('chapter2');
+        }, 500);
     }
 
     // 返回主页
     returnToMainMenu() {
         // 隐藏结果屏幕
         this.game.elements.resultScreen.classList.add('hidden');
+        // 确保解锁第二章
+        this.game.unlockChapter('chapter2');
+        // 强制更新章节选择界面
+        this.game.updateChapterAvailability();
         // 显示章节选择屏幕
         this.game.returnToChapterSelect();
-        // 在主页选关界面新增第二章选项（未解锁）
-        this.game.addChapterOption('chapter2', '第二章：灵魂献祭', false);
     }
 }
 

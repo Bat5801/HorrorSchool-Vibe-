@@ -1,7 +1,15 @@
 class SchoolHorrorGame {
     constructor() {
+        // 先定义本地存储键
+        const unlockedChaptersKey = 'schoolHorrorGame_unlockedChapters';
+
+        // 先加载已解锁章节
+        const unlockedChapters = this.loadUnlockedChapters(unlockedChaptersKey);
+
         // 游戏状态
         this.gameState = {
+            // 存储已解锁章节的本地存储键
+            unlockedChaptersKey: unlockedChaptersKey,
             playerName: '',
             playerGender: '',
             currentScene: 'start',
@@ -11,8 +19,12 @@ class SchoolHorrorGame {
             inventory: [],
             hasKey: false,
             hasSeenGhost: false,
-            unlockedChapters: ['prologue'] // 默认解锁序章
+            // 已解锁章节
+            unlockedChapters: unlockedChapters
         };
+
+        // 时间更新定时器
+        this.timeUpdateInterval = null;
 
         // DOM元素
         this.elements = {
@@ -75,6 +87,8 @@ class SchoolHorrorGame {
         this.elements.startButton.addEventListener('click', () => {
             this.elements.startScreen.classList.add('hidden');
             this.elements.chapterSelectScreen.classList.remove('hidden');
+            // 更新章节可用性状态
+            this.updateChapterAvailability();
         });
 
         // 重新开始按钮
@@ -123,6 +137,9 @@ class SchoolHorrorGame {
         this.elements.chapterSelectScreen.classList.add('hidden');
         this.elements.gameScreen.classList.remove('hidden');
 
+        // 启动自动时间更新
+        this.startAutoTimeUpdate();
+
         // 根据章节初始化第一个场景
         if (chapter === 'prologue') {
             this.loadScene('classroom');
@@ -136,6 +153,16 @@ class SchoolHorrorGame {
                     { text: '返回章节选择', action: () => this.returnToChapterSelect() }
                 ]);
             }
+        } else if (chapter === 'chapter2') {
+            // 加载Chapter2的起始场景
+            if (window.Chapter2) {
+                this.chapter2 = new Chapter2(this);
+                this.chapter2.start();
+            } else {
+                this.showDialogue('无法加载第二章内容，请确保Chapter2.js已正确加载。', [
+                    { text: '返回章节选择', action: () => this.returnToChapterSelect() }
+                ]);
+            }
         }
     }
 
@@ -143,8 +170,12 @@ class SchoolHorrorGame {
     unlockChapter(chapter) {
         if (!this.gameState.unlockedChapters.includes(chapter)) {
             this.gameState.unlockedChapters.push(chapter);
+            // 保存到本地存储
+            this.saveUnlockedChapters();
             // 更新章节选择界面
             this.updateChapterAvailability();
+            console.log('已解锁章节:', chapter);
+            console.log('当前已解锁章节列表:', this.gameState.unlockedChapters);
         }
     }
 
@@ -156,15 +187,16 @@ class SchoolHorrorGame {
                 item.classList.remove('locked');
                 item.classList.add('available');
                 const lockIcon = item.querySelector('.lock-icon');
-                const chapterDesc = item.querySelector('.chapter-description');
+                const chapterDesc = item.querySelector('p'); // 选择<p>标签作为描述元素
                 if (lockIcon) {
-                    lockIcon.style.display = 'none';
+                    lockIcon.remove(); // 完全移除锁图标
                 }
                 if (chapterDesc) {
                     if (chapter === 'chapter1') {
-                        chapterDesc.textContent = '第一章：探索学校的神秘事件，解开隐藏的秘密。找到生锈的钥匙，面对镜中的幽魂，揭露校园背后的真相。';
+                        chapterDesc.textContent = '探索学校的神秘事件，解开隐藏的秘密。找到生锈的钥匙，面对镜中的幽魂，揭露校园背后的真相。';
+                    } else if (chapter === 'chapter2') {
+                        chapterDesc.textContent = '遇见第一位朋友，发现更多关于学校的秘密。探索宿舍区，解开鬼影之谜。';
                     }
-                    // 可以添加更多章节的描述更新
                 }
             }
         });
@@ -280,9 +312,30 @@ class SchoolHorrorGame {
             principalOffice: '🔑 校长办公室',
             staircase: '🔺 楼梯间',
             artRoom: '🎨 美术教室',
-            basement: '🔻 地下室'
+            basement: '🔻 地下室',
+            deepCorridor: '🚶‍♂️ 昏暗走廊',
+            exit: '🚪 侧门出口',
+            undergroundPassage: '🔦 地下通道',
+            ironDoorArea: '🔐 铁门区域',
+            slimeExit: '💧 粘液出口',
+            stoneDoorChamber: '🏛️ 石门密室',
+            redPlayground: '🔴 红色操场',
+            undergroundAbyss: '🕳️ 地下深渊',
+            hiddenCatacombs: '⚰️ 隐藏墓穴',
+            innerSanctum: '🔮 内殿',
+            flowerField: '🌺 花海空间',
+            upperFloor: '🔼 上层走廊',
+            upperFloorCorridor: '🔄 楼上走廊',
+            principalsOffice: '👨‍💼 校长办公室',
+            creatureLair: '🐉 生物巢穴',
+            lotusDimension: '🪷 莲花维度',
+            entrance: '🚪 学校入口',
+            quadrangle: '🏫 校园广场',
+            dormitory: '🏠 宿舍区',
+            canteen: '🍽️ 食堂',
+            storageRoom: '🔒 仓库'
         };
-
+        
         this.elements.gameMap.innerHTML = `<div class="location-name">${locations[location] || '未知地点'}</div>
 <div class="pixel-map">${this.generatePixelMap(location)}</div>`;
     }
@@ -306,6 +359,48 @@ class SchoolHorrorGame {
                 return '■■■■■■■■■■\n■ P     P ■\n■         ■\n■   E     ■\n■         ■\n■ P     P ■\n■■■■■■■■■■';
             case 'basement':
                 return '■■■■■■■■■■\n■   D     ■\n■         ■\n■   S     ■\n■         ■\n■   C     ■\n■■■■■■■■■■';
+            case 'deepCorridor':
+                return '■■■■■■■■■■■■■■■■\n■                 ■\n■                 ■\n■                 ■\n■                 ■\n■   D             ■\n■■■■■■■■■■■■■■■■';
+            case 'exit':
+                return '■■■■■■■■■\n■   O     ■\n■         ■\n■■■■■■■■■';
+            case 'undergroundPassage':
+                return '■■■■■■■■■■■\n■           ■\n■   ▒▒▒▒▒   ■\n■   ▒   ▒   ■\n■   ▒▒▒▒▒   ■\n■           ■\n■■■■■■■■■■■';
+            case 'ironDoorArea':
+                return '■■■■■■■■■■\n■   █     ■\n■         ■\n■   ▒     ■\n■         ■\n■   █     ■\n■■■■■■■■■■';
+            case 'slimeExit':
+                return '■■■■■■■■■\n■   ~     ■\n■  ~~     ■\n■   ~     ■\n■■■■■■■■■';
+            case 'stoneDoorChamber':
+                return '■■■■■■■■■\n■         ■\n■   ▒▒▒   ■\n■   ▒@▒   ■\n■   ▒▒▒   ■\n■         ■\n■■■■■■■■■';
+            case 'redPlayground':
+                return '■■■■■■■■■■■■■■\n■               ■\n■   ▲           ■\n■               ■\n■■■■■■■■■■■■■■';
+            case 'undergroundAbyss':
+                return '■■■■■■■■■■\n■           ■\n■           ■\n■   ▓▓▓     ■\n■           ■\n■           ■\n■■■■■■■■■■';
+            case 'hiddenCatacombs':
+                return '■■■■■■■■■\n■ ☠ ☠ ☠ ■\n■         ■\n■ ☠ ☠ ☠ ■\n■         ■\n■ ☠ ☠ ☠ ■\n■■■■■■■■■';
+            case 'innerSanctum':
+                return '■■■■■■■■■\n■   ▒     ■\n■  ▒▒▒    ■\n■   ▒     ■\n■  ▒@▒    ■\n■   ▒     ■\n■■■■■■■■■';
+            case 'flowerField':
+                return '■■■■■■■■■\n■ ⚘ ⚘ ⚘ ■\n■ ⚘ ⚘ ⚘ ■\n■ ⚘ ⚘ ⚘ ■\n■ ⚘ ⚘ ⚘ ■\n■ ⚘ ⚘ ⚘ ■\n■■■■■■■■■';
+            case 'upperFloor':
+                return '■■■■■■■■■■■■■■\n■               ■\n■   ▒   ▒   ▒   ■\n■               ■\n■■■■■■■■■■■■■■';
+            case 'upperFloorCorridor':
+                return '■■■■■■■■■■■■■■\n■ ▓ ▓ ▓ ▓ ▓ ▓ ■\n■               ■\n■ ▓ ▓ ▓ ▓ ▓ ▓ ■\n■■■■■■■■■■■■■■';
+            case 'principalsOffice':
+                return '■■■■■■■■\n■   D    ■\n■  ▓▓▓   ■\n■   F    ■\n■■■■■■■■';
+            case 'creatureLair':
+                return '■■■■■■■■■\n■         ■\n■   ▓     ■\n■  ▓▓▓    ■\n■   ▓     ■\n■         ■\n■■■■■■■■■';
+            case 'lotusDimension':
+                return '■■■■■■■■■\n■   ⚘     ■\n■  ⚘⚘⚘    ■\n■   ⚘     ■\n■  ⚘⚘⚘    ■\n■   ⚘     ■\n■■■■■■■■■';
+            case 'entrance':
+                return '■■■■■■■■■■\n■          ■\n■  ■■■_■■■ ■\n■          ■\n■■■■■■■■■■';
+            case 'quadrangle':
+                return '■■■■■■■■■■■■■■\n■                ■\n■  ■■■■■■■■■■■■ ■\n■                ■\n■■■■■■■■■■■■■■';
+            case 'dormitory':
+                return '■■■■■■■■■■\n■ ■■ ■■ ■■ ■\n■ ■■ ■■ ■■ ■\n■ ■■ ■■ ■■ ■\n■■■■■■■■■■';
+            case 'canteen':
+                return '■■■■■■■■■■\n■ ■■■■■■■■ ■\n■ ■■■■■■■■ ■\n■ ■■■■■■■■ ■\n■■■■■■■■■■';
+            case 'storageRoom':
+                return '■■■■■■■■■■\n■ ■■■■■■■■ ■\n■ ■■■■■■■■ ■\n■ ■■■■■■■■ ■\n■■■■■■■■■■';
             default:
                 return '■■■■■■■■\n■   ?    ■\n■        ■\n■■■■■■■■';
         }
@@ -478,8 +573,14 @@ class SchoolHorrorGame {
         let chapterName = '';
         if (this.gameState.currentChapter === 'prologue') {
             chapterName = '序章-「晚自习后」';
+            // 显示下一章按钮
+            this.elements.nextChapterBtn.classList.remove('hidden');
         } else if (this.gameState.currentChapter === 'chapter1') {
             chapterName = '第一章-「初见幽凄」';
+            // 显示下一章按钮
+            this.elements.nextChapterBtn.classList.remove('hidden');
+        } else if (this.gameState.currentChapter === 'chapter2') {
+            chapterName = '第二章-「深入诡域」';
         }
         
         this.elements.resultChapter.textContent = chapterName;
@@ -490,46 +591,83 @@ class SchoolHorrorGame {
     goToNextChapter() {
         // 隐藏结算页面
         this.elements.resultScreen.classList.add('hidden');
-        
+    
         if (this.gameState.currentChapter === 'prologue') {
             // 保存序章的结束时间
             const endTime = this.gameState.gameTime;
             // 传递时间到第一章
             this.startGame('chapter1', endTime);
         } else if (this.gameState.currentChapter === 'chapter1') {
-            // 这里可以添加第二章的逻辑
-            this.showDialogue('第二章尚未解锁，敬请期待...', [
-                { text: '返回章节选择', action: () => this.returnToChapterSelect() }
-            ]);
+            // 传递时间到第二章
+            const endTime = this.gameState.gameTime;
+            this.startGame('chapter2', endTime);
         }
     }
 
+    // 完成章节
     completeChapter() {
         if (this.gameState.currentChapter === 'prologue') {
-            // 检查unlockedChapters是否存在，如果不存在则初始化
-            if (!this.gameState.unlockedChapters) {
-                this.gameState.unlockedChapters = ['prologue'];
-            }
             // 解锁第一章
             this.unlockChapter('chapter1');
         } else if (this.gameState.currentChapter === 'chapter1') {
-            // 可以在这里添加解锁第二章的逻辑
+            // 解锁第二章
+            this.unlockChapter('chapter2');
         }
-        
+    
         // 显示结算画面
         this.showResultScreen();
     }
 
     // 返回章节选择
     returnToChapterSelect() {
+        // 清除时间更新定时器
+        if (this.timeUpdateInterval) {
+            clearInterval(this.timeUpdateInterval);
+            this.timeUpdateInterval = null;
+        }
         this.elements.gameScreen.classList.add('hidden');
         this.elements.deathScreen.classList.add('hidden');
         this.elements.resultScreen.classList.add('hidden');
         this.elements.chapterSelectScreen.classList.remove('hidden');
     }
 
+    // 已删除重复的restartGame方法定义
+    // 保留下面的版本，使用统一的unlockedChaptersKey
+    
+
+    // 加载已解锁章节
+    loadUnlockedChapters(unlockedChaptersKey) {
+        try {
+            const saved = localStorage.getItem(unlockedChaptersKey);
+            return saved ? JSON.parse(saved) : ['prologue'];
+        } catch (e) {
+            console.error('Failed to load unlocked chapters:', e);
+            return ['prologue'];
+        }
+    }
+
+    // 保存已解锁章节
+    saveUnlockedChapters() {
+        try {
+            localStorage.setItem(
+                this.gameState.unlockedChaptersKey,
+                JSON.stringify(this.gameState.unlockedChapters)
+            );
+        } catch (e) {
+            console.error('Failed to save unlocked chapters:', e);
+        }
+    }
+
+    // 重启游戏
     restartGame() {
-        // 重置游戏状态
+        // 清除时间更新定时器
+        if (this.timeUpdateInterval) {
+            clearInterval(this.timeUpdateInterval);
+            this.timeUpdateInterval = null;
+        }
+
+        // 重置游戏状态，但保留已解锁章节
+        const unlockedChapters = this.gameState.unlockedChapters;
         this.gameState = {
             playerName: this.gameState.playerName,
             playerGender: this.gameState.playerGender,
@@ -540,7 +678,8 @@ class SchoolHorrorGame {
             inventory: [],
             hasKey: false,
             hasSeenGhost: false,
-            unlockedChapters: ['prologue'] // 默认解锁序章
+            unlockedChapters: unlockedChapters,
+            unlockedChaptersKey: 'schoolHorrorGame_unlockedChapters'
         };
 
         // 重置界面
@@ -572,6 +711,41 @@ class SchoolHorrorGame {
     parseTime(timeStr) {
         const [hours, minutes] = timeStr.split(':').map(Number);
         return hours * 60 + minutes;
+    }
+
+    // 启动自动时间更新（每30秒更新一次）
+    startAutoTimeUpdate() {
+        // 清除任何现有的定时器
+        if (this.timeUpdateInterval) {
+            clearInterval(this.timeUpdateInterval);
+        }
+
+        // 设置新的定时器（30秒更新一次）
+        this.timeUpdateInterval = setInterval(() => {
+            // 解析当前时间
+            const [hours, minutes] = this.gameState.gameTime.split(':').map(Number);
+            
+            // 增加1分钟
+            let newMinutes = minutes + 1;
+            let newHours = hours;
+            
+            // 处理小时进位
+            if (newMinutes >= 60) {
+                newMinutes = 0;
+                newHours += 1;
+            }
+            
+            // 处理24小时制
+            if (newHours >= 24) {
+                newHours = 0;
+            }
+            
+            // 格式化新时间
+            const newTime = `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
+            
+            // 更新游戏时间
+            this.updateGameTime(newTime);
+        }, 30000); // 30秒
     }
 
     // 更多剧情方法...
