@@ -626,6 +626,8 @@ class Chapter1 {
     takeKey() {
         this.keyFound = true;
         this.game.gameState.inventory.push('生锈的钥匙');
+        // 更新物品栏显示
+        this.game.updateInventoryDisplay();
         this.game.showDialogue('你拿起了生锈的钥匙，它看起来很古老。', [
             { text: '继续探索', action: () => this.exploreBasement() }
         ]);

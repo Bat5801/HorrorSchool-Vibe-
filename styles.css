@@ -282,11 +282,114 @@ body {
     border-bottom: 2px solid #444;
 }
 
-#game-map {
+#game-container-inner {
+    display: flex;
     height: calc(100% - 180px);
+}
+
+#game-map {
+    flex: 3;
     background-color: #111;
     position: relative;
     overflow: hidden;
+}
+
+#game-inventory {
+    flex: 1;
+    background-color: #222;
+    border-left: 2px solid #444;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.inventory-title {
+    color: #ff9999;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #444;
+}
+
+#inventory-items {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+}
+
+.inventory-item {
+    background-color: #333;
+    padding: 0.5rem;
+    border: 1px solid #555;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.inventory-item:hover {
+    background-color: #444;
+    border-color: #ff4d4d;
+}
+
+.inventory-empty {
+    color: #777;
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.9rem;
+}
+
+/* 确保物品栏文字与像素风格一致 */
+.inventory-title, .inventory-item-name, .inventory-empty {
+    font-family: 'mplus_hzk_12', monospace;
+    letter-spacing: 0;
+}
+
+/* 物品栏动画效果 */
+.inventory-item {
+    transition: all 0.2s ease;
+    transform: scale(1);
+}
+
+.inventory-item:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 5px rgba(255, 77, 77, 0.5);
+}
+
+.inventory-item-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+}
+
+.inventory-item-name {
+    flex: 1;
+}
+
+/* 自定义滚动条 */
+#inventory-items::-webkit-scrollbar {
+    width: 8px;
+}
+
+#inventory-items::-webkit-scrollbar-track {
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+
+#inventory-items::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+#inventory-items::-webkit-scrollbar-thumb:hover {
+    background: #ff4d4d;
 }
 
 #game-dialogue {

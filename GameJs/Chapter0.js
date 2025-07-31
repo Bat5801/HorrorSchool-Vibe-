@@ -143,6 +143,9 @@ class SchoolHorrorGame {
         // 启动自动时间更新
         this.startAutoTimeUpdate();
 
+        // 更新物品栏显示
+        this.updateInventoryDisplay();
+
         // 根据章节初始化第一个场景
         if (chapter === 'prologue') {
             this.loadScene('classroom');
@@ -356,6 +359,82 @@ class SchoolHorrorGame {
         
         this.elements.gameMap.innerHTML = `<div class="location-name">${locations[location] || '未知地点'}</div>
 <div class="pixel-map">${this.generatePixelMap(location)}</div>`;
+
+        // 更新物品栏显示
+        this.updateInventoryDisplay();
+    }
+
+    // 更新物品栏显示
+    updateInventoryDisplay() {
+        const inventoryElement = document.getElementById('inventory-items');
+        if (!inventoryElement) return;
+
+        inventoryElement.innerHTML = '';
+
+        if (this.gameState.inventory.length === 0) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'inventory-empty';
+            emptyMessage.textContent = '物品栏为空';
+            inventoryElement.appendChild(emptyMessage);
+            return;
+        }
+
+        // 物品简介映射
+        const itemDescriptions = {
+            '手机': '你的智能手机，可以用来照明和查看信息。',
+            '钥匙': '一把生锈的钥匙，能打开校长办公室的门。',
+            '笔记本': '一本旧笔记本，上面记录着一些奇怪的符号。',
+            '手电筒': '可以在黑暗中照明的工具。',
+            '药草': '一种神秘的药草，可能有特殊功效。',
+            '神秘纸条': '一张泛黄的纸条，上面写着："不要相信镜子里的倒影"。',
+            '地下室地图': '一张标记着学校地下结构的地图，显示了通往地下室的路径。',
+            '生锈的钥匙': '一把生锈的钥匙，能打开图书馆的门。'
+        };
+
+        this.gameState.inventory.forEach(item => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'inventory-item';
+            itemElement.title = itemDescriptions[item] || '未知物品';
+
+            // 为不同物品选择不同的图标
+            let icon = '🎒'; // 默认背包图标
+            if (item === '手机') icon = '📱';
+            else if (item === '钥匙' || item === '生锈的钥匙') icon = '🔑';
+            else if (item === '笔记本') icon = '📓';
+            else if (item === '手电筒') icon = '🔦';
+            else if (item === '药草') icon = '🌿';
+            else if (item === '神秘纸条') icon = '📜';
+            else if (item === '地下室地图') icon = '🗺️';
+            else if (item === '手电筒') icon = '🔦';
+            else if (item === '药草') icon = '🌿';
+
+            itemElement.innerHTML = `
+                <div class="inventory-item-icon">${icon}</div>
+                <div class="inventory-item-name">${item}</div>
+            `;
+
+            inventoryElement.appendChild(itemElement);
+        });
+    }
+
+    // 使用物品
+    useItem(item) {
+        // 这里可以添加使用物品的逻辑
+        // 例如，如果是手机，可以显示查看手机的内容
+        if (item === '手机') {
+            // 检查当前章节是否有手机相关功能
+            if (this.gameState.currentChapter === 'chapter3' && window.Chapter3 && this.chapter3) {
+                this.chapter3.checkPhone();
+            } else {
+                this.showDialogue('你查看了手机，但没有收到新消息。', [
+                    { text: '继续', action: () => this.clearDialogue() }
+                ]);
+            }
+        } else {
+            this.showDialogue(`你使用了${item}，但没有发生任何事情。`, [
+                { text: '继续', action: () => this.clearDialogue() }
+            ]);
+        }
     }
 
     // 生成像素风格地图
@@ -812,26 +891,168 @@ class SchoolHorrorGame {
 
     // 更多剧情方法...
     checkWindow() { this.showDeath('窗户被铁条封死了，当你靠近时，一只冰冷的手从铁条间伸了出来抓住了你！'); }
-    searchForKey() { this.showDialogue('你在讲台抽屉里找到了一把生锈的钥匙！', [{ text: '尝试开门', action: () => this.tryDoorKey() }]); }
+    searchForKey() {
+        this.showDialogue('你在讲台抽屉里找到了一把生锈的钥匙！', [
+            {
+                text: '拿起钥匙',
+                action: () => {
+                    if (this.gameState && this.gameState.inventory) {
+                        if (!this.gameState.inventory.includes('钥匙')) {
+                            this.gameState.inventory.push('钥匙');
+                            // 显示物品栏内容
+                            this.showDialogue(
+                                `已将钥匙添加到物品栏。当前物品栏：${this.gameState.inventory.join(', ')}`,
+                                [{
+                                    text: '尝试开门',
+                                    action: () => { this.tryDoorKey(); }
+                                }]
+                            );
+                        } else {
+                            this.showDialogue('钥匙已存在于物品栏。', [{
+                                text: '尝试开门',
+                                action: () => { this.tryDoorKey(); }
+                            }]);
+                        }
+                    } else {
+                        this.showDialogue('无法添加物品，物品栏不存在。', [{
+                            text: '尝试开门',
+                            action: () => { this.tryDoorKey(); }
+                        }]);
+                    }
+                }
+            }
+        ]);
+    }
     usePhoneLight() { this.showDialogue('手机屏幕亮起，你看到讲台上有一张纸条。', [{ text: '拿起纸条', action: () => this.takeNote() }]); }
     hideUnderDesk() { this.showDeath('桌子开始剧烈摇晃，然后整个压了下来...'); }
     goToLibrary() { this.loadScene('library'); }
     goToBathroom() { this.loadScene('bathroom'); }
     goToPrincipalOffice() { this.loadScene('principalOffice'); }
-    takeKey() { this.showDialogue('你把钥匙放进了口袋。', [{ text: '离开图书馆', action: () => this.goToCorridor() }]); }
+    takeKey() {
+        this.showDialogue('你发现了一把闪着银光的钥匙！', [
+            {
+                text: '放进背包',
+                action: () => {
+                    if (this.gameState && this.gameState.inventory) {
+                        if (!this.gameState.inventory.includes('钥匙')) {
+                            this.gameState.inventory.push('钥匙');
+                            // 显示物品栏内容
+                            this.showDialogue(
+                                `已将钥匙添加到物品栏。当前物品栏：${this.gameState.inventory.join(', ')}`,
+                                [{
+                                    text: '离开图书馆',
+                                    action: () => { this.goToCorridor(); }
+                                }]
+                            );
+                        } else {
+                            this.showDialogue('钥匙已存在于物品栏。', [{
+                                text: '离开图书馆',
+                                action: () => { this.goToCorridor(); }
+                            }]);
+                        }
+                    } else {
+                        this.showDialogue('无法添加物品，物品栏不存在。', [{
+                            text: '离开图书馆',
+                            action: () => { this.goToCorridor(); }
+                        }]);
+                    }
+                }
+            }
+        ]);
+    }
     leaveKey() { this.showDeath('你决定不拿钥匙，这时书架突然倒塌，把你压在了下面...'); }
     escapeBookpile() { this.showDialogue('你挣扎着从书堆里爬出来，感觉有什么东西在盯着你。', [{ text: '离开图书馆', action: () => this.goToCorridor() }]); }
     tryDoorKey() { this.showDialogue('钥匙插进锁孔，但转不动。这时你听到身后传来脚步声...', [{ text: '转身查看', action: () => this.seeWhoIsThere() }, { text: '继续尝试开门', action: () => this.keepTryingKey() }]); }
-    takeNote() { this.showDialogue('纸条上写着："它不喜欢噪音，用水可以暂时驱赶它"', [{ text: '收好纸条', action: () => this.goToCorridor() }]); }
+    takeNote() {
+        this.showDialogue('纸条上写着："它不喜欢噪音，用水可以暂时驱赶它"', [
+            {
+                text: '收好纸条',
+                action: () => {
+                    // 直接使用this而不是window.game
+                    if (this.gameState && this.gameState.inventory) {
+                        if (!this.gameState.inventory.includes('神秘纸条')) {
+                            this.gameState.inventory.push('神秘纸条');
+                            // 显示物品栏内容
+                            this.showDialogue(
+                                `已将神秘纸条添加到物品栏。当前物品栏：${this.gameState.inventory.join(', ')}`,
+                                [{
+                                    text: '继续',
+                                    action: () => { this.goToCorridor(); }
+                                }]
+                            );
+                        } else {
+                            this.showDialogue('神秘纸条已存在于物品栏。', [{
+                                text: '继续',
+                                action: () => { this.goToCorridor(); }
+                            }]);
+                        }
+                    } else {
+                        this.showDialogue('无法添加物品，物品栏不存在。', [{
+                            text: '继续',
+                            action: () => { this.goToCorridor(); }
+                        }]);
+                    }
+                }
+            }
+        ]);
+    }
     seeWhoIsThere() { this.showDeath('站在你身后的是一个穿着校服的学生，他的脸正在慢慢融化...'); }
 
-    checkDrawer() { this.showDialogue('你打开了抽屉，里面放着一张泛黄的纸条："不要相信镜子里的倒影"', [{ text: '关闭抽屉', action: () => this.goToCorridor() }]); }
+    checkDrawer() {
+        if (this.gameState && this.gameState.inventory) {
+            const noteItem = '神秘纸条';
+            if (!this.gameState.inventory.includes(noteItem)) {
+                this.gameState.inventory.push(noteItem);
+                this.showDialogue(
+                    `你打开了抽屉，里面放着一张泛黄的纸条："不要相信镜子里的倒影"。已将${noteItem}添加到物品栏。当前物品栏：${this.gameState.inventory.join(', ')}`,
+                    [{
+                        text: '关闭抽屉',
+                        action: () => { this.goToCorridor(); }
+                    }]
+                );
+            } else {
+                this.showDialogue('你打开了抽屉，里面放着一张泛黄的纸条："不要相信镜子里的倒影"。你已经有这张纸条了。', [{
+                    text: '关闭抽屉',
+                    action: () => { this.goToCorridor(); }
+                }]);
+            }
+        } else {
+            this.showDialogue('你打开了抽屉，里面放着一张泛黄的纸条："不要相信镜子里的倒影"', [{
+                text: '关闭抽屉',
+                action: () => { this.goToCorridor(); }
+            }]);
+        }
+    }
     keepTryingKey() { this.showDeath('门锁突然转动，但门打开的瞬间，一股黑色的雾气涌了进来，吞噬了你...'); }
     continueReading() { this.showDialogue('日记最后一页写着："它在找替身，特别是在这个日子留在学校的人..."', [{ text: '寻找出口', action: () => this.findExit() }]); }
     closeDiary() { this.showDialogue('你合上日记，决定寻找离开学校的方法。', [{ text: '离开办公室', action: () => this.goToCorridor() }]); }
     findExit() { this.showDialogue('根据日记的线索，你找到了学校的侧门！', [{ text: '尝试开门', action: () => this.trySideDoor() }]); }
     trySideDoor() { this.showDialogue('门没有锁！你推开门，发现外面不是街道，而是一条昏暗的走廊，墙上挂着指向地下室的路标。', [{ text: '进入走廊', action: () => this.enterDeepCorridor() }]); }
-    enterDeepCorridor() { this.gameState.inventory.push('地下室地图'); this.showDialogue('走廊尽头的墙上钉着一张泛黄的地图，标记着学校地下结构。你意识到自己正深入学校未知区域。', [{ text: '按地图探索', action: () => this.gameClear() }]); }
+    enterDeepCorridor() {
+        if (this.gameState && this.gameState.inventory) {
+            if (!this.gameState.inventory.includes('地下室地图')) {
+                this.gameState.inventory.push('地下室地图');
+                // 显示物品栏内容
+                this.showDialogue(
+                    `你发现了一张地下室地图，并将其添加到物品栏。当前物品栏：${this.gameState.inventory.join(', ')}`,
+                    [{
+                        text: '按地图探索',
+                        action: () => { this.gameClear(); }
+                    }]
+                );
+            } else {
+                this.showDialogue('你已经有地下室地图了。走廊尽头的墙上钉着一张泛黄的地图，标记着学校地下结构。', [{
+                    text: '按地图探索',
+                    action: () => { this.gameClear(); }
+                }]);
+            }
+        } else {
+            this.showDialogue('走廊尽头的墙上钉着一张泛黄的地图，标记着学校地下结构。你意识到自己正深入学校未知区域。', [{
+                text: '按地图探索',
+                action: () => { this.gameClear(); }
+            }]);
+        }
+    }
     gameClear() { this.completeChapter(); }
 
     // 返回主界面

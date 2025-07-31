@@ -139,6 +139,8 @@ class Chapter2 {
         // 自动给玩家手机
         if (!this.game.gameState.inventory.includes('手机')) {
             this.game.gameState.inventory.push('手机');
+            // 更新物品栏显示
+            this.game.updateInventoryDisplay();
         }
         this.showDialogue('你用手机拍下了公告栏的内容。照片上，寻人启事的眼睛似乎在盯着你。', [
             { text: '进入学校', action: () => this.enterSchool() }
@@ -178,6 +180,12 @@ class Chapter2 {
     }
 
     takeNote() {
+        // 添加便签到物品栏
+        if (!this.game.gameState.inventory.includes('便签')) {
+            this.game.gameState.inventory.push('便签');
+            // 更新物品栏显示
+            this.game.updateInventoryDisplay();
+        }
         this.showDialogue('你把便签放进兜里。虽然不知道是谁写的，但直觉告诉你这很重要。', [
             { text: '离开宿舍', action: () => this.enterSchool() }
         ]);
@@ -216,7 +224,12 @@ ${this.getPronoun('subject')}快速收拾东西，无意中掉落一张照片。
 
     takeMysteriousKey() {
         this.mysteriousKeyFound = true;
-        this.game.gameState.inventory.push('神秘钥匙');
+        // 添加神秘钥匙到物品栏（避免重复添加）
+        if (!this.game.gameState.inventory.includes('神秘钥匙')) {
+            this.game.gameState.inventory.push('神秘钥匙');
+            // 更新物品栏显示
+            this.game.updateInventoryDisplay();
+        }
         this.showDialogue('你把钥匙放进兜里。这把钥匙看起来很古老，符号像是某种密码。', [
             { text: '给朋友包扎', action: () => this.bandageFriend() }
         ]);
@@ -347,7 +360,12 @@ ${this.friendName}紧紧抓住你的胳膊："我们...我们是不是做错了�
     }
 
     takeMineralWater() {
-        this.game.gameState.inventory.push('矿泉水');
+        // 添加矿泉水到物品栏（避免重复添加）
+        if (!this.game.gameState.inventory.includes('矿泉水')) {
+            this.game.gameState.inventory.push('矿泉水');
+            // 更新物品栏显示
+            this.game.updateInventoryDisplay();
+        }
         this.showDialogue('你把矿泉水放进包里。虽然便签提醒不要喝，但带着以防万一总是好的。', [
             { text: '离开小卖部', action: () => this.showCanteenScene() }
         ]);
@@ -367,7 +385,12 @@ ${this.friendName}紧紧抓住你的胳膊："我们...我们是不是做错了�
     }
 
     takeDiaryPage() {
-        this.game.gameState.inventory.push('日记残页');
+        // 添加日记残页到物品栏（避免重复添加）
+        if (!this.game.gameState.inventory.includes('日记残页')) {
+            this.game.gameState.inventory.push('日记残页');
+            // 更新物品栏显示
+            this.game.updateInventoryDisplay();
+        }
         this.showDialogue('你收起日记纸。10月13日...这和公告栏上寻人启事的日期一样。', [
             { text: '离开厨房', action: () => this.showCanteenScene() }
         ]);
@@ -392,8 +415,18 @@ ${this.friendName}紧紧抓住你的胳膊："我们...我们是不是做错了�
     }
 
     checkStorageItems() {
-        this.game.gameState.inventory.push('锤子');
-        this.game.gameState.inventory.push('手电筒');
+        // 添加锤子到物品栏（避免重复添加）
+        if (!this.game.gameState.inventory.includes('锤子')) {
+            this.game.gameState.inventory.push('锤子');
+            // 更新物品栏显示
+            this.game.updateInventoryDisplay();
+        }
+        // 添加手电筒到物品栏（避免重复添加）
+        if (!this.game.gameState.inventory.includes('手电筒')) {
+            this.game.gameState.inventory.push('手电筒');
+            // 更新物品栏显示
+            this.game.updateInventoryDisplay();
+        }
         this.showDialogue('你在杂物堆里翻找，找到一把生锈的锤子和一个手电筒。手电筒还能亮，但光线很弱。你把它们都放进了包里。\n在一个木箱里，你发现了一张旧地图，上面标记着学校的各个区域，包括一个用红笔圈起来的"禁区"。', [
             { text: '拿走地图', action: () => this.takeStorageMap() },
             { text: '继续翻找', action: () => this.searchMoreItems() }
@@ -415,7 +448,12 @@ ${this.friendName}紧紧抓住你的胳膊："我们...我们是不是做错了�
     }
 
     takeStorageMap() {
-        this.game.gameState.inventory.push('仓库地图');
+        // 添加仓库地图到物品栏（避免重复添加）
+        if (!this.game.gameState.inventory.includes('仓库地图')) {
+            this.game.gameState.inventory.push('仓库地图');
+            // 更新物品栏显示
+            this.game.updateInventoryDisplay();
+        }
         this.showDialogue('你收起地图。禁区...那会是什么地方？', [
             { text: '继续翻找', action: () => this.searchMoreItems() },
             { text: '离开仓库', action: () => this.enterSchool() }
@@ -426,6 +464,8 @@ ${this.friendName}紧紧抓住你的胳膊："我们...我们是不是做错了�
         // 将徽章添加到物品栏
         if (!this.game.gameState.inventory.includes('徽章')) {
             this.game.gameState.inventory.push('徽章');
+            // 更新物品栏显示
+            this.game.updateInventoryDisplay();
         }
         this.showDialogue('你继续翻找，在一个铁盒里发现了一枚徽章，上面刻着和钥匙、盒子相同的符号。' +
     '突然，仓库的灯闪了几下，熄灭了。黑暗中，你听到沉重的脚步声向你靠近。', [

@@ -56,6 +56,8 @@ class Chapter3 {
         // 添加手机到物品栏
         if (!this.game.gameState.inventory.includes('手机')) {
             this.game.gameState.inventory.push('手机');
+            // 更新物品栏显示
+            this.game.updateInventoryDisplay();
         }
         this.game.updateGameMap('schoolGate');
         this.plotProgress = 0;
@@ -229,7 +231,12 @@ ${friendName}慢慢睁开眼睛，眼神恢复了正常："发生了什么事？
     }
 
     exploreFoyer() {
-        this.game.gameState.inventory.push('古老卷轴');
+        // 添加古老卷轴到物品栏（避免重复添加）
+        if (!this.game.gameState.inventory.includes('古老卷轴')) {
+            this.game.gameState.inventory.push('古老卷轴');
+            // 更新物品栏显示
+            this.game.updateInventoryDisplay();
+        }
         this.showDialogue('你在大厅的角落找到了一个古老的卷轴。卷轴上记载着学校的历史："本校建立于1923年，原址为古代祭坛。每年10月13日，需献祭一名灵魂以平息祭坛的愤怒。"', [
             { text: '收起卷轴', action: () => this.keepScroll() },
             { text: '进入地下入口', action: () => this.loadScene('labyrinth') }
@@ -248,7 +255,12 @@ ${friendName}慢慢睁开眼睛，眼神恢复了正常："发生了什么事？
     }
 
     exploreClassroom() {
-        this.game.gameState.inventory.push('祭祀 dagger');
+        // 添加祭祀 dagger到物品栏（避免重复添加）
+        if (!this.game.gameState.inventory.includes('祭祀 dagger')) {
+            this.game.gameState.inventory.push('祭祀 dagger');
+            // 更新物品栏显示
+            this.game.updateInventoryDisplay();
+        }
         this.showDialogue('教室里的课桌上刻满了奇怪的符号。讲台上放着一把生锈的匕首，匕首上沾着暗红色的痕迹。墙壁上有一行用血写的字："10月13日，他们会来"。', [
             { text: '拿起匕首', action: () => this.takeDagger() },
             { text: '离开教室', action: () => this.showAbandonedWingScene() }
@@ -376,7 +388,11 @@ ${this.game.gameState.playerGender === "male" ? "张伟" : "李娜"}倒在地上
     touchFire() {
         if (this.symbolDeciphered) {
             this.artifactCollected = true;
-            this.game.gameState.inventory.push('火焰 artifact');
+            if (!this.game.gameState.inventory.includes('火焰 artifact')) {
+                this.game.gameState.inventory.push('火焰 artifact');
+                // 更新物品栏显示
+                this.game.updateInventoryDisplay();
+            }
             this.showDialogue('你触摸火焰，火焰化作一个红色的宝石，飞到你的手中。宝石上刻着与徽章相同的符号。', [
                 { text: '返回迷宫', action: () => this.showLabyrinthScene() }
             ]);
@@ -388,7 +404,11 @@ ${this.game.gameState.playerGender === "male" ? "张伟" : "李娜"}倒在地上
     touchLotus() {
         if (this.symbolDeciphered) {
             this.artifactCollected = true;
-            this.game.gameState.inventory.push('水之 artifact');
+            if (!this.game.gameState.inventory.includes('水之 artifact')) {
+                this.game.gameState.inventory.push('水之 artifact');
+                // 更新物品栏显示
+                this.game.updateInventoryDisplay();
+            }
             this.showDialogue('你触摸莲花，莲花化作一个蓝色的宝石，飞到你的手中。宝石上刻着与徽章相同的符号。', [
                 { text: '返回迷宫', action: () => this.showLabyrinthScene() }
             ]);
@@ -400,7 +420,11 @@ ${this.game.gameState.playerGender === "male" ? "张伟" : "李娜"}倒在地上
     pickFruit() {
         if (this.symbolDeciphered) {
             this.artifactCollected = true;
-            this.game.gameState.inventory.push('生命 artifact');
+            if (!this.game.gameState.inventory.includes('生命 artifact')) {
+                this.game.gameState.inventory.push('生命 artifact');
+                // 更新物品栏显示
+                this.game.updateInventoryDisplay();
+            }
             this.showDialogue('你摘下果实，果实化作一个绿色的宝石，飞到你的手中。宝石上刻着与徽章相同的符号。', [
                 { text: '返回迷宫', action: () => this.showLabyrinthScene() }
             ]);
