@@ -103,13 +103,21 @@ class SchoolHorrorGame {
     }
 
     // 开始游戏
-    startGame(chapter) {
+    startGame(chapter, startTime = null) {
         // 设置当前章节
         this.gameState.currentChapter = chapter;
         
         // 更新玩家信息显示
         this.elements.playerNameDisplay.textContent = this.gameState.playerName;
         this.elements.playerGenderDisplay.textContent = this.gameState.playerGender === 'male' ? '男' : '女';
+
+        // 如果提供了起始时间，则更新游戏时间
+        if (startTime) {
+            this.updateGameTime(startTime);
+        } else {
+            // 否则重置为默认时间
+            this.updateGameTime('21:00');
+        }
 
         // 切换屏幕
         this.elements.chapterSelectScreen.classList.add('hidden');
@@ -342,7 +350,7 @@ class SchoolHorrorGame {
     }
 
     goToCorridor() {
-        this.updateGameTime('21:30');
+        // 确保时间只能前进，不设置固定时间
         this.loadScene('corridor');
     }
 
@@ -448,7 +456,10 @@ class SchoolHorrorGame {
         this.elements.resultScreen.classList.add('hidden');
         
         if (this.gameState.currentChapter === 'prologue') {
-            this.startGame('chapter1');
+            // 保存序章的结束时间
+            const endTime = this.gameState.gameTime;
+            // 传递时间到第一章
+            this.startGame('chapter1', endTime);
         } else if (this.gameState.currentChapter === 'chapter1') {
             // 这里可以添加第二章的逻辑
             this.showDialogue('第二章尚未解锁，敬请期待...', [
@@ -508,10 +519,23 @@ class SchoolHorrorGame {
         this.checkStartConditions();
     }
 
-    // 辅助方法
+    // 更新游戏时间（确保时间只能前进）
     updateGameTime(time) {
-        this.gameState.gameTime = time;
-        this.elements.currentTimeDisplay.textContent = time;
+        // 解析当前时间和新时间
+        const currentTime = this.parseTime(this.gameState.gameTime);
+        const newTime = this.parseTime(time);
+        
+        // 只有当新时间晚于当前时间时才更新
+        if (newTime > currentTime) {
+            this.gameState.gameTime = time;
+            this.elements.currentTimeDisplay.textContent = time;
+        }
+    }
+
+    // 解析时间字符串为分钟数（用于比较）
+    parseTime(timeStr) {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        return hours * 60 + minutes;
     }
 
     // 更多剧情方法...
@@ -534,7 +558,8 @@ class SchoolHorrorGame {
     continueReading() { this.showDialogue('日记最后一页写着："它在找替身，特别是在这个日子留在学校的人..."', [{ text: '寻找出口', action: () => this.findExit() }]); }
     closeDiary() { this.showDialogue('你合上日记，决定寻找离开学校的方法。', [{ text: '离开办公室', action: () => this.goToCorridor() }]); }
     findExit() { this.showDialogue('根据日记的线索，你找到了学校的侧门！', [{ text: '尝试开门', action: () => this.trySideDoor() }]); }
-    trySideDoor() { this.showDialogue('门没有锁！你成功逃出了学校！', [{ text: '游戏结束', action: () => this.gameClear() }]); }
+    trySideDoor() { this.showDialogue('门没有锁！你推开门，发现外面不是街道，而是一条昏暗的走廊，墙上挂着指向地下室的路标。', [{ text: '进入走廊', action: () => this.enterDeepCorridor() }]); }
+    enterDeepCorridor() { this.gameState.inventory.push('地下室地图'); this.showDialogue('走廊尽头的墙上钉着一张泛黄的地图，标记着学校地下结构。你意识到自己正深入学校未知区域。', [{ text: '按地图探索', action: () => this.gameClear() }]); }
     gameClear() { this.completeChapter(); }
 }
 
