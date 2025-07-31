@@ -311,18 +311,36 @@ class SchoolHorrorGame {
         }
     }
 
-    // 显示对话
+    // 打字机效果显示对话
     showDialogue(text, choices) {
-        this.elements.dialogueText.textContent = text;
+        this.elements.dialogueText.textContent = '';
         this.elements.dialogueChoices.innerHTML = '';
-
-        choices.forEach(choice => {
-            const button = document.createElement('button');
-            button.className = 'choice-btn';
-            button.textContent = choice.text;
-            button.addEventListener('click', choice.action);
-            this.elements.dialogueChoices.appendChild(button);
-        });
+        
+        let index = 0;
+        const typeSpeed = 70; // 打字速度，毫秒/字符（稍微调慢）
+        
+        // 清除任何正在进行的打字动画
+        if (this.typingInterval) {
+            clearInterval(this.typingInterval);
+        }
+        
+        // 开始打字动画
+        this.typingInterval = setInterval(() => {
+            if (index < text.length) {
+                this.elements.dialogueText.textContent += text.charAt(index);
+                index++;
+            } else {
+                clearInterval(this.typingInterval);
+                // 打字完成后显示选项
+                choices.forEach(choice => {
+                    const button = document.createElement('button');
+                    button.className = 'choice-btn';
+                    button.textContent = choice.text;
+                    button.addEventListener('click', choice.action);
+                    this.elements.dialogueChoices.appendChild(button);
+                });
+            }
+        }, typeSpeed);
     }
 
     // 清除对话
@@ -425,11 +443,29 @@ class SchoolHorrorGame {
         ]);
     }
 
-   // 显示死亡
+   // 打字机效果显示死亡消息
     showDeath(message) {
         this.elements.gameScreen.classList.add('hidden');
         this.elements.deathScreen.classList.remove('hidden');
-        this.elements.deathMessage.textContent = message;
+        this.elements.deathMessage.textContent = '';
+        
+        let index = 0;
+        const typeSpeed = 70; // 打字速度，毫秒/字符（比对话稍慢）
+        
+        // 清除任何正在进行的打字动画
+        if (this.typingInterval) {
+            clearInterval(this.typingInterval);
+        }
+        
+        // 开始打字动画
+        this.typingInterval = setInterval(() => {
+            if (index < message.length) {
+                this.elements.deathMessage.textContent += message.charAt(index);
+                index++;
+            } else {
+                clearInterval(this.typingInterval);
+            }
+        }, typeSpeed);
     }
 
     // 完成章节

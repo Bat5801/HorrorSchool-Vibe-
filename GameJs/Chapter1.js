@@ -4,6 +4,54 @@ class Chapter1 {
         this.plotProgress = 0;
         this.ghostEncountered = false;
         this.keyFound = false;
+        this.typingInterval = null;
+    }
+
+    // 打字机效果显示对话
+    showDialogue(text, choices) {
+        // 保存原始的game.showDialogue方法
+        const originalShowDialogue = this.game.showDialogue;
+        
+        // 重写game.showDialogue方法以实现打字机效果
+        this.game.showDialogue = (text, choices) => {
+            const dialogueText = document.getElementById('dialogue-text') || this.game.elements.dialogueText;
+            const dialogueChoices = document.getElementById('dialogue-choices') || this.game.elements.dialogueChoices;
+            
+            dialogueText.textContent = '';
+            dialogueChoices.innerHTML = '';
+            
+            let index = 0;
+            const typeSpeed = 50; // 打字速度，毫秒/字符
+            
+            // 清除任何正在进行的打字动画
+            if (this.typingInterval) {
+                clearInterval(this.typingInterval);
+            }
+            
+            // 开始打字动画
+            this.typingInterval = setInterval(() => {
+                if (index < text.length) {
+                    dialogueText.textContent += text.charAt(index);
+                    index++;
+                } else {
+                    clearInterval(this.typingInterval);
+                    // 打字完成后显示选项
+                    choices.forEach(choice => {
+                        const button = document.createElement('button');
+                        button.className = 'choice-btn';
+                        button.textContent = choice.text;
+                        button.addEventListener('click', choice.action);
+                        dialogueChoices.appendChild(button);
+                    });
+                }
+            }, typeSpeed);
+        };
+        
+        // 调用重写后的showDialogue方法
+        this.game.showDialogue(text, choices);
+        
+        // 恢复原始的game.showDialogue方法（可选）
+        // this.game.showDialogue = originalShowDialogue;
     }
 
     // 开始第一章
@@ -50,13 +98,13 @@ class Chapter1 {
     showUndergroundPassageScene() {
         this.game.gameState.currentScene = 'undergroundPassage';
         this.game.updateGameMap('undergroundPassage');
-        this.game.showDialogue('石阶尽头是条潮湿的地下通道，墙壁上刻着奇怪的符号。远处传来水滴声和隐约的低语。', [
+        this.showDialogue('石阶尽头是条潮湿的地下通道，墙壁上刻着奇怪的符号。远处传来水滴声和隐约的低语。', [
             { text: '继续前进', action: () => this.deepenExploration() }
         ]);
     }
 
     deepenExploration() {
-        this.game.showDialogue('通道前方出现三个岔路口，每个路口都散发着不同的气味——铁锈、腐烂和消毒水。', [
+        this.showDialogue('通道前方出现三个岔路口，每个路口都散发着不同的气味——铁锈、腐烂和消毒水。', [
             { text: '走铁锈味路口', action: () => this.chooseRustPath() },
             { text: '走腐烂味路口', action: () => this.chooseDecayPath() },
             { text: '走消毒水味路口', action: () => this.chooseDisinfectantPath() }
@@ -64,63 +112,63 @@ class Chapter1 {
     }
 
     chooseRustPath() {
-        this.game.showDialogue('铁锈味的通道墙壁上布满管道，其中一根正在滴着红色液体。尽头隐约可见一扇铁门。', [
+        this.showDialogue('铁锈味的通道墙壁上布满管道，其中一根正在滴着红色液体。尽头隐约可见一扇铁门。', [
             { text: '检查铁门', action: () => this.examineIronDoor() }
         ]);
     }
 
     chooseDecayPath() {
-        this.game.showDialogue('腐烂味的通道地面覆盖着粘稠的黑色物质，墙壁渗出粘液。远处传来类似咀嚼的声音。', [
+        this.showDialogue('腐烂味的通道地面覆盖着粘稠的黑色物质，墙壁渗出粘液。远处传来类似咀嚼的声音。', [
             { text: '绕过粘液前进', action: () => this.navigateSlime() }
         ]);
     }
 
     chooseDisinfectantPath() {
-        this.game.showDialogue('消毒水味的通道异常干净，两侧排列着标有"实验体"编号的金属柜。灯光忽明忽暗。', [
+        this.showDialogue('消毒水味的通道异常干净，两侧排列着标有"实验体"编号的金属柜。灯光忽明忽暗。', [
             { text: '打开最近的柜子', action: () => this.openExperimentCabinet() }
         ]);
     }
 
     examineIronDoor() {
-        this.game.showDialogue('铁门上有个六位数密码锁，旁边贴着泛黄的纸条："密码是第一个牺牲者的生日"。', [
+        this.showDialogue('铁门上有个六位数密码锁，旁边贴着泛黄的纸条："密码是第一个牺牲者的生日"。', [
             { text: '尝试输入密码', action: () => this.enterDoorPassword() }
         ]);
     }
 
     navigateSlime() {
-        this.game.showDialogue('你踮脚绕过粘液，却踢到一个金属罐。声音惊动了黑暗中的东西——一双发光的眼睛正朝你靠近。', [
+        this.showDialogue('你踮脚绕过粘液，却踢到一个金属罐。声音惊动了黑暗中的东西——一双发光的眼睛正朝你靠近。', [
             { text: '退回岔路口', action: () => this.deepenExploration() },
             { text: '拿出地图防御', action: () => this.useMapAsShield() }
         ]);
     }
 
     openExperimentCabinet() {
-        this.game.showDialogue('柜子里是个玻璃容器，浸泡着类似心脏的器官，标签写着："实验体-07，1998.06.13"。', [
+        this.showDialogue('柜子里是个玻璃容器，浸泡着类似心脏的器官，标签写着："实验体-07，1998.06.13"。', [
             { text: '记录日期', action: () => this.noteExperimentDate() }
         ]);
     }
 
     noteExperimentDate() {
         this.game.gameState.experimentDate = '19980613';
-        this.game.showDialogue('你记下了日期：1998年6月13日。这个日期似乎很重要，可能和什么密码有关。', [
+        this.showDialogue('你记下了日期：1998年6月13日。这个日期似乎很重要，可能和什么密码有关。', [
             { text: '继续探索', action: () => this.deepenExploration() }
         ]);
     }
 
     enterDoorPassword() {
         if (this.game.gameState.experimentDate === '19980613') {
-            this.game.showDialogue('你输入了19980613，铁门发出沉重的响声，缓缓打开。门后是一个更大的地下空间。', [
+            this.showDialogue('你输入了19980613，铁门发出沉重的响声，缓缓打开。门后是一个更大的地下空间。', [
                 { text: '进入铁门', action: () => this.enterIronDoorArea() }
             ]);
         } else {
-            this.game.showDialogue('密码错误！铁门发出刺耳的警报声，远处传来急促的脚步声。', [
+            this.showDialogue('密码错误！铁门发出刺耳的警报声，远处传来急促的脚步声。', [
                 { text: '退回岔路口', action: () => this.deepenExploration() }
             ]);
         }
     }
 
     useMapAsShield() {
-        this.game.showDialogue('你迅速拿出地图挡在面前，地图突然发出微弱的光芒，逼退了黑暗中的生物。', [
+        this.showDialogue('你迅速拿出地图挡在面前，地图突然发出微弱的光芒，逼退了黑暗中的生物。', [
             { text: '继续前进', action: () => this.proceedThroughSlime() }
         ]);
     }
@@ -128,7 +176,7 @@ class Chapter1 {
     enterIronDoorArea() {
         this.game.gameState.currentScene = 'ironDoorArea';
         this.game.updateGameMap('ironDoorArea');
-        this.game.showDialogue('铁门后是一个巨大的地下实验室，中央摆放着一个发光的容器，里面漂浮着类似人形的影子。', [
+        this.showDialogue('铁门后是一个巨大的地下实验室，中央摆放着一个发光的容器，里面漂浮着类似人形的影子。', [
             { text: '接近容器', action: () => this.approachContainer() }
         ]);
     }
@@ -136,13 +184,13 @@ class Chapter1 {
     proceedThroughSlime() {
         this.game.gameState.currentScene = 'slimeExit';
         this.game.updateGameMap('slimeExit');
-        this.game.showDialogue('你穿过粘液区，发现一扇刻有奇怪符号的石门。符号与序章日记中的标记一模一样。', [
+        this.showDialogue('你穿过粘液区，发现一扇刻有奇怪符号的石门。符号与序章日记中的标记一模一样。', [
             { text: '尝试开门', action: () => this.tryOpenStoneDoor() }
         ]);
     }
 
     approachContainer() {
-        this.game.showDialogue('你靠近容器，里面的人形影子突然睁开眼睛，死死盯着你。容器表面开始出现裂纹。', [
+        this.showDialogue('你靠近容器，里面的人形影子突然睁开眼睛，死死盯着你。容器表面开始出现裂纹。', [
             { text: '后退', action: () => this.backAwayFromContainer() },
             { text: '触摸容器', action: () => this.touchContainer() }
         ]);
@@ -150,24 +198,24 @@ class Chapter1 {
 
     tryOpenStoneDoor() {
         if (this.game.gameState.inventory.includes('地下室地图')) {
-            this.game.showDialogue('你将地图按在石门上，地图发出金色光芒，与石门上的符号产生共鸣。石门缓缓打开。', [
+            this.showDialogue('你将地图按在石门上，地图发出金色光芒，与石门上的符号产生共鸣。石门缓缓打开。', [
                 { text: '进入门内', action: () => this.enterStoneDoor() }
             ]);
         } else {
-            this.game.showDialogue('石门纹丝不动。你需要找到某种钥匙或方法来打开它。', [
+            this.showDialogue('石门纹丝不动。你需要找到某种钥匙或方法来打开它。', [
                 { text: '返回岔路口', action: () => this.deepenExploration() }
             ]);
         }
     }
 
     backAwayFromContainer() {
-        this.game.showDialogue('你迅速后退，容器在你面前爆炸，释放出大量黑色烟雾。烟雾中传来凄厉的尖叫。', [
+        this.showDialogue('你迅速后退，容器在你面前爆炸，释放出大量黑色烟雾。烟雾中传来凄厉的尖叫。', [
             { text: '逃离实验室', action: () => this.escapeLab() }
         ]);
     }
 
     touchContainer() {
-        this.game.showDialogue('你触摸容器的瞬间，一道强光闪过。你发现自己站在学校的操场上，但周围的一切都呈现出诡异的红色。', [
+        this.showDialogue('你触摸容器的瞬间，一道强光闪过。你发现自己站在学校的操场上，但周围的一切都呈现出诡异的红色。', [
             { text: '探索红色操场', action: () => this.exploreRedPlayground() }
         ]);
     }
@@ -175,13 +223,13 @@ class Chapter1 {
     enterStoneDoor() {
         this.game.gameState.currentScene = 'stoneDoorChamber';
         this.game.updateGameMap('stoneDoorChamber');
-        this.game.showDialogue('门后是一个古老的石室，中央有一个祭坛，上面放着一本黑色封面的书。', [
+        this.showDialogue('门后是一个古老的石室，中央有一个祭坛，上面放着一本黑色封面的书。', [
             { text: '打开书本', action: () => this.openBlackBook() }
         ]);
     }
 
     escapeLab() {
-        this.game.showDialogue('你沿着来路逃离实验室，却发现出口不知何时变成了教室的门。当你推开门，发现自己回到了晚自习后的教室，一切仿佛从未发生过。', [
+        this.showDialogue('你沿着来路逃离实验室，却发现出口不知何时变成了教室的门。当你推开门，发现自己回到了晚自习后的教室，一切仿佛从未发生过。', [
             { text: '查看教室', action: () => this.returnToClassroom() }
         ]);
     }
@@ -189,13 +237,13 @@ class Chapter1 {
     exploreRedPlayground() {
         this.game.gameState.currentScene = 'redPlayground';
         this.game.updateGameMap('redPlayground');
-        this.game.showDialogue('红色的操场寂静无声，跑道上残留着奇怪的痕迹。操场中央的旗杆上挂着一面褪色的旗帜，上面画着与石门相同的符号。', [
+        this.showDialogue('红色的操场寂静无声，跑道上残留着奇怪的痕迹。操场中央的旗杆上挂着一面褪色的旗帜，上面画着与石门相同的符号。', [
             { text: '走向旗杆', action: () => this.approachFlagpole() }
         ]);
     }
 
     openBlackBook() {
-        this.game.showDialogue('书本打开的瞬间，无数黑色的文字从书页中飞出，钻入你的脑海。你看到了学校的过去，看到了那些被遗忘的灵魂。', [
+        this.showDialogue('书本打开的瞬间，无数黑色的文字从书页中飞出，钻入你的脑海。你看到了学校的过去，看到了那些被遗忘的灵魂。', [
             { text: '继续阅读', action: () => this.continueReadingBook() }
         ]);
     }
@@ -563,7 +611,7 @@ class Chapter1 {
 
     encounterGhost() {
         this.ghostEncountered = true;
-        this.game.showDeath('女孩的鬼魂扑向了你，你感到一阵刺骨的寒冷，然后什么都不知道了...');
+        this.showDeath('女孩的鬼魂扑向了你，你感到一阵刺骨的寒冷，然后什么都不知道了...');
     }
 
     goToBasement() {
@@ -637,6 +685,40 @@ class Chapter1 {
     completeChapter() {
         // 显示结算画面
         this.showResultScreen();
+    }
+
+    // 打字机效果显示死亡信息
+    showDeath(message) {
+        // 清除正在进行的打字动画
+        if (this.typingInterval) {
+            clearInterval(this.typingInterval);
+            this.typingInterval = null;
+        }
+
+        // 获取死亡信息元素
+        const deathMessageElement = this.game.elements.deathMessage;
+        deathMessageElement.textContent = ''; // 清空文本
+
+        // 显示死亡屏幕
+        this.game.elements.deathScreen.classList.remove('hidden');
+
+        let index = 0;
+        const typeSpeed = 70; // 打字速度，70ms/字符
+
+        // 开始打字动画
+        this.typingInterval = setInterval(() => {
+            if (index < message.length) {
+                deathMessageElement.textContent += message.charAt(index);
+                index++;
+            } else {
+                clearInterval(this.typingInterval);
+                this.typingInterval = null;
+                // 显示重新开始按钮
+                setTimeout(() => {
+                    this.game.elements.restartBtn.classList.remove('hidden');
+                }, 500);
+            }
+        }, typeSpeed);
     }
 
     // 更新游戏时间（确保时间只能前进）
