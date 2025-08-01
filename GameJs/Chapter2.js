@@ -569,16 +569,22 @@ ${this.getPronoun('subject')}转身跑出仓库，照片掉在地上。你捡起
 
     // 显示结算画面
     showResultScreen() {
+        // 隐藏游戏屏幕，显示结果屏幕
         this.game.elements.gameScreen.classList.add('hidden');
         this.game.elements.resultScreen.classList.remove('hidden');
-        
+
         // 显示章节名称和通关时间
         const chapterName = '第二章-「宿舍鬼影」';
+        const gameTime = this.game.gameState.gameTime || '22:30'; // 默认值
+
         this.game.elements.resultChapter.textContent = chapterName;
-        this.game.elements.resultTime.textContent = this.game.gameState.gameTime;
-        
-        // 隐藏下一章按钮（第三章尚未制作）
-        this.game.elements.nextChapterBtn.classList.add('hidden');
+        this.game.elements.resultTime.textContent = gameTime;
+
+        // 显示下一章按钮
+        const nextChapterBtn = this.game.elements.nextChapterBtn;
+        nextChapterBtn.textContent = '进入第三章';
+        nextChapterBtn.classList.remove('hidden');
+        nextChapterBtn.onclick = () => this.startChapter3();
     }
 
     // 完成章节
