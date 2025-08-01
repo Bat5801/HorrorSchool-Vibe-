@@ -5,6 +5,106 @@ class Chapter1 {
         this.ghostEncountered = false;
         this.keyFound = false;
         this.typingInterval = null;
+
+        // 确保game对象有showInputDialog方法
+        if (!this.game.showInputDialog) {
+            this.game.showInputDialog = function(message, inputPlaceholder, callback) {
+                const dialogueText = document.getElementById('dialogue-text');
+                const dialogueChoices = document.getElementById('dialogue-choices');
+                const gameActions = document.getElementById('game-actions');
+                let typingInterval;
+
+                // 清空对话框
+                dialogueText.innerHTML = '';
+                dialogueChoices.innerHTML = '';
+                gameActions.innerHTML = '';
+
+                // 打字机效果显示消息
+                let index = 0;
+                const typeSpeed = 70; // 打字速度，毫秒/字符
+
+                // 清除任何正在进行的打字动画
+                if (this.typingInterval) {
+                    clearInterval(this.typingInterval);
+                }
+
+                // 开始打字动画
+                this.typingInterval = setInterval(() => {
+                    if (index < message.length) {
+                        dialogueText.textContent += message.charAt(index);
+                        index++;
+                    } else {
+                        clearInterval(this.typingInterval);
+                        // 打字完成后创建输入框
+                        createInputElements();
+                    }
+                }, typeSpeed);
+
+                // 创建输入框和按钮的函数
+                function createInputElements() {
+                    const inputContainer = document.createElement('div');
+                    inputContainer.className = 'input-container';
+
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.placeholder = inputPlaceholder;
+                    input.className = 'password-input';
+                    input.maxLength = 8;
+                    input.style.width = '200px';
+                    input.style.padding = '0.8rem';
+                    input.style.backgroundColor = '#1a1a1a';
+                    input.style.border = '2px solid #555';
+                    input.style.color = '#fff';
+                    input.style.fontSize = '1rem';
+                    input.style.borderRadius = '4px';
+                    input.style.marginRight = '10px';
+                    input.style.fontFamily = 'mplus_hzk_12, Press Start 2P, cursive';
+
+                    // 创建确认按钮
+                    const confirmBtn = document.createElement('button');
+                    confirmBtn.textContent = '确认';
+                    confirmBtn.className = 'confirm-btn';
+                    confirmBtn.style.padding = '0.8rem';
+                    confirmBtn.style.backgroundColor = '#333';
+                    confirmBtn.style.border = '2px solid #555';
+                    confirmBtn.style.color = '#fff';
+                    confirmBtn.style.fontSize = '0.9rem';
+                    confirmBtn.style.cursor = 'pointer';
+                    confirmBtn.style.transition = 'all 0.3s ease';
+                    confirmBtn.style.fontFamily = 'mplus_hzk_12, Press Start 2P, cursive';
+
+                    confirmBtn.addEventListener('mouseover', function() {
+                        this.style.backgroundColor = '#555';
+                        this.style.borderColor = '#ff4d4d';
+                    });
+
+                    confirmBtn.addEventListener('mouseout', function() {
+                        this.style.backgroundColor = '#333';
+                        this.style.borderColor = '#555';
+                    });
+
+                    confirmBtn.addEventListener('click', function() {
+                        callback(input.value);
+                        inputContainer.remove();
+                    });
+
+                    // 允许按Enter键提交
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            callback(input.value);
+                            inputContainer.remove();
+                        }
+                    });
+
+                    inputContainer.appendChild(input);
+                    inputContainer.appendChild(confirmBtn);
+                    dialogueChoices.appendChild(inputContainer);
+
+                    // 自动聚焦输入框
+                    input.focus();
+                }
+            };
+        }
     }
 
     // 打字机效果显示对话
@@ -89,9 +189,24 @@ class Chapter1 {
     }
 
     examineIronDoor() {
-        this.showDialogue('铁门上有个六位数密码锁，旁边贴着泛黄的纸条："密码是第一个牺牲者的生日"。', [
-            { text: '尝试输入密码', action: () => this.enterDoorPassword() }
-        ]);
+        // 创建输入框形式的密码输入
+        this.game.showInputDialog('铁门上有个八位数密码锁，旁边贴着泛黄的纸条："密码是第一个牺牲者的生日"。',
+'请输入八位数字密码', 
+            (input) => this.validatePassword(input));
+    }
+
+    // 验证密码
+    validatePassword(inputPassword) {
+        if (inputPassword === '19980613') {
+            this.showDialogue('你输入了' + inputPassword + '，铁门发出沉重的响声，缓缓打开。门后是一个更大的地下空间。', [
+                { text: '进入铁门', action: () => this.enterIronDoorArea() }
+            ]);
+        } else {
+            this.showDialogue('密码错误！铁门发出刺耳的警报声，远处传来急促的脚步声。', [
+                { text: '重新输入', action: () => this.examineIronDoor() },
+                { text: '退回岔路口', action: () => this.deepenExploration() }
+            ]);
+        }
     }
 
     navigateSlime() {
@@ -114,16 +229,9 @@ class Chapter1 {
         ]);
     }
 
+    // 旧的密码输入方法，保留但不再使用
     enterDoorPassword() {
-        if (this.game.gameState.experimentDate === '19980613') {
-            this.showDialogue('你输入了19980613，铁门发出沉重的响声，缓缓打开。门后是一个更大的地下空间。', [
-                { text: '进入铁门', action: () => this.enterIronDoorArea() }
-            ]);
-        } else {
-            this.showDialogue('密码错误！铁门发出刺耳的警报声，远处传来急促的脚步声。', [
-                { text: '退回岔路口', action: () => this.deepenExploration() }
-            ]);
-        }
+        this.validatePassword('19980613');
     }
 
     useMapAsShield() {
