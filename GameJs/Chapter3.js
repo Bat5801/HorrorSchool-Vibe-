@@ -581,9 +581,23 @@ ${friendName}倒在地上，昏迷不醒。`, [
                 // 显示重新开始按钮
                 setTimeout(() => {
                     // 显示重新开始按钮并绑定事件
-                const restartBtn = this.game.elements.restartGameBtn || document.getElementById('restart-game');
-                restartBtn.classList.remove('hidden');
-                restartBtn.onclick = () => this.game.restartGame();
+            const restartBtn = this.game.elements.restartGameBtn || document.getElementById('restart-game');
+            restartBtn.classList.remove('hidden');
+            restartBtn.onclick = () => {
+                // 重置第三章状态
+                this.plotProgress = 0;
+                this.artifactCollected = false;
+                this.truthRevealed = false;
+                this.friendSaved = false;
+                this.symbolDeciphered = false;
+                // 清除可能存在的定时器
+                if (this.typingInterval) {
+                    clearInterval(this.typingInterval);
+                    this.typingInterval = null;
+                }
+                // 调用游戏重启方法
+                this.game.restartGame();
+            };
                 }, 500);
             }
         }, typeSpeed);
