@@ -9,6 +9,23 @@ class Chapter3 {
         this.symbolDeciphered = false;
     }
 
+    // 根据玩家性别获取朋友的正确代词
+    getFriendPronoun(type) {
+        const isMale = this.game.gameState.playerGender === 'male';
+        switch(type) {
+            case 'subject': // 主格 (他/她)
+                return isMale ? '他' : '她';
+            case 'object': // 宾格 (他/她)
+                return isMale ? '他' : '她';
+            case 'possessive': // 所有格 (他的/她的)
+                return isMale ? '他的' : '她的';
+            case 'pronoun': // 代词 (他/她)
+                return isMale ? '他' : '她';
+            default:
+                return isMale ? '他' : '她';
+        }
+    }
+
     // 打字机效果显示对话
     showDialogue(text, choices) {
         // 直接使用游戏对象的showDialogue方法
@@ -106,7 +123,7 @@ class Chapter3 {
         
         if (this.friendSaved) {
             this.showDialogue(`${friendName}的房间很整洁，但空气中弥漫着一股奇怪的气味。书桌上放着一张你们的合照，照片背面写着：'永远的朋友'。`, [
-                { text: '和他/她交谈', action: () => this.talkToFriend() },
+                { text: `和${this.getFriendPronoun('object')}交谈`, action: () => this.talkToFriend() },
                 { text: '离开房间', action: () => this.enterSchool() }
             ]);
         } else {
@@ -120,7 +137,7 @@ class Chapter3 {
     talkToFriend() {
         const friendName = this.game.gameState.playerGender === "male" ? "张伟" : "李娜";
         this.showDialogue(`${friendName}看起来很疲惫："我还是不敢相信发生的一切。那个黑影...它一直在跟着我。"`, [
-            { text: '安慰他/她', action: () => this.comfortFriend() },
+            { text: `安慰${this.getFriendPronoun('object')}`, action: () => this.comfortFriend() },
             { text: '一起探索学校', action: () => this.exploreWithFriend() }
         ]);
     }
@@ -209,7 +226,7 @@ class Chapter3 {
         const friendName = this.game.gameState.playerGender === "male" ? "张伟" : "李娜";
         this.showDialogue(`${friendName}发出刺耳的笑声："我？我很好...只是...我终于找到了新的宿主..."
 ${this.game.gameState.playerGender === "male" ? "他" : "她"}的身体开始扭曲，皮肤下似乎有什么东西在蠕动。`, [
-            { text: '尝试唤醒他/她', action: () => this.tryToWakeFriend() },
+            { text: `尝试唤醒${this.getFriendPronoun('object')}`, action: () => this.tryToWakeFriend() },
             { text: '逃跑', action: () => this.enterSchool() }
         ]);
     }
@@ -229,7 +246,7 @@ ${this.game.gameState.playerGender === "male" ? "他" : "她"}的身体开始扭
 ${friendName}的动作突然停住，眼睛里的红光闪烁了一下："朋友...？"
 ${this.game.gameState.playerGender === "male" ? "他" : "她"}的身体开始颤抖，似乎在挣扎。`, [
                 { text: '继续唤醒', action: () => this.continueWakingFriend() },
-                { text: '带他/她离开', action: () => this.leaveWithFriend() }
+                { text: `带${this.getFriendPronoun('object')}离开`, action: () => this.leaveWithFriend() }
             ]);
         } else {
             this.showDialogue(`${friendName}的攻击没有停止，${this.game.gameState.playerGender === 'male' ? '他' : '她'}似乎完全失去了理智。`, [
@@ -244,7 +261,7 @@ ${this.game.gameState.playerGender === "male" ? "他" : "她"}的身体开始颤
             const friendName = this.game.gameState.playerGender === "male" ? "张伟" : "李娜";
             this.showDialogue(`你掏出徽章，徽章发出强烈的光芒。${friendName}惨叫一声，倒在地上。一个黑色的影子从${this.game.gameState.playerGender === "male" ? "他" : "她"}体内飘出，消失在夜色中。
 ${friendName}慢慢睁开眼睛，眼神恢复了正常："发生了什么事？我...我刚才好像做了一个噩梦。"`, [
-                { text: '带他/她离开', action: () => this.leaveWithFriend() },
+                { text: `带${this.getFriendPronoun('object')}离开`, action: () => this.leaveWithFriend() },
                 { text: '一起探索学校', action: () => this.exploreWithFriend() }
             ]);
             this.friendSaved = true;
@@ -385,7 +402,7 @@ ${friendName}慢慢睁开眼睛，眼神恢复了正常："发生了什么事？
         if (this.game.gameState.inventory.includes('仪式匕首')) {
             this.showDialogue(`你冲向黑袍人，用匕首刺向${this.game.gameState.playerGender === "male" ? "他" : "她"}。黑袍人惨叫一声，化作一缕黑烟。
 ${this.game.gameState.playerGender === "male" ? "张伟" : "李娜"}倒在地上，昏迷不醒。祭坛开始崩塌，整个房间摇摇欲坠。`, [
-                { text: '带他/她离开', action: () => this.escapeWithFriend() },
+                { text: `带${this.getFriendPronoun('object')}离开`, action: () => this.escapeWithFriend() },
                 { text: '寻找出口', action: () => this.findExit() }
             ]);
         } else {
@@ -500,7 +517,7 @@ ${this.game.gameState.playerGender === "male" ? "张伟" : "李娜"}倒在地上
         if (this.game.gameState.inventory.includes('徽章')) {
             this.showDialogue(`你掏出徽章，徽章发出强烈的光芒。黑袍人惨叫一声，化作一缕黑烟。
 ${this.game.gameState.playerGender === "male" ? "张伟" : "李娜"}倒在地上，昏迷不醒。祭坛开始崩塌，整个房间摇摇欲坠。`, [
-                { text: '带他/她离开', action: () => this.escapeWithFriend() },
+                { text: `带${this.getFriendPronoun('object')}离开`, action: () => this.escapeWithFriend() },
                 { text: '寻找出口', action: () => this.findExit() }
             ]);
         } else {
@@ -531,7 +548,7 @@ ${this.game.gameState.playerGender === "male" ? "张伟" : "李娜"}慢慢苏醒
         this.showDialogue(`${friendName}的身体颤抖得更厉害了："朋友...对...我们是朋友..."
 黑色的影子从${this.game.gameState.playerGender === "male" ? "他" : "她"}体内慢慢飘出，消失在夜色中。
 ${friendName}倒在地上，昏迷不醒。`, [
-            { text: '带他/她离开', action: () => this.leaveWithFriend() },
+            { text: `带${this.getFriendPronoun('object')}离开`, action: () => this.leaveWithFriend() },
             { text: '一起探索学校', action: () => this.exploreWithFriend() }
         ]);
         this.friendSaved = true;

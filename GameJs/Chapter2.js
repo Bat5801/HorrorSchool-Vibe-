@@ -25,7 +25,7 @@ class Chapter2 {
             case 'pronoun': // 代词 (他/她)
                 return isMale ? '他' : '她';
             default:
-                return '他/她';
+                return isMale ? '他' : '她';
         }
     }
 
@@ -214,7 +214,7 @@ ${this.getPronoun('subject')}快速收拾东西，无意中掉落一张照片。
 
     pickUpPhoto() {
         this.showDialogue(`你捡起照片。涂黑的脸看起来像是后来用马克笔涂的，边缘有些模糊。照片背面写着："他们都得死"。\n${this.friendName}慌忙抢过照片："这...这不是我的！我不知道怎么会有这种东西！"`, [
-            { text: '相信他/她', action: () => this.trustFriend() },
+            { text: `相信${this.getPronoun('object')}`, action: () => this.trustFriend() },
             { text: '追问到底', action: () => this.questionFriend() }
         ]);
     }
