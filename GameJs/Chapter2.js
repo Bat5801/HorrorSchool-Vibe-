@@ -449,8 +449,8 @@ ${this.friendName}紧紧抓住你的胳膊："我们...我们是不是做错了�
 
     takeStorageMap() {
         // 添加仓库地图到物品栏（避免重复添加）
-        if (!this.game.gameState.inventory.includes('仓库地图')) {
-            this.game.gameState.inventory.push('仓库地图');
+        if (!this.game.gameState.inventory.includes('禁区地图')) {
+            this.game.gameState.inventory.push('禁区地图');
             // 更新物品栏显示
             this.game.updateInventoryDisplay();
         }

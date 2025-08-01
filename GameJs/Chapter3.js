@@ -256,8 +256,8 @@ ${friendName}慢慢睁开眼睛，眼神恢复了正常："发生了什么事？
 
     exploreClassroom() {
         // 添加祭祀 dagger到物品栏（避免重复添加）
-        if (!this.game.gameState.inventory.includes('祭祀 dagger')) {
-            this.game.gameState.inventory.push('祭祀 dagger');
+        if (!this.game.gameState.inventory.includes('仪式匕首')) {
+            this.game.gameState.inventory.push('仪式匕首');
             // 更新物品栏显示
             this.game.updateInventoryDisplay();
         }
@@ -332,7 +332,7 @@ ${friendName}慢慢睁开眼睛，眼神恢复了正常："发生了什么事？
     }
 
     stopSacrifice() {
-        if (this.game.gameState.inventory.includes('祭祀 dagger')) {
+        if (this.game.gameState.inventory.includes('仪式匕首')) {
             this.showDialogue(`你冲向黑袍人，用匕首刺向${this.game.gameState.playerGender === "male" ? "他" : "她"}。黑袍人惨叫一声，化作一缕黑烟。
 ${this.game.gameState.playerGender === "male" ? "张伟" : "李娜"}倒在地上，昏迷不醒。祭坛开始崩塌，整个房间摇摇欲坠。`, [
                 { text: '带他/她离开', action: () => this.escapeWithFriend() },
@@ -434,7 +434,7 @@ ${this.game.gameState.playerGender === "male" ? "张伟" : "李娜"}倒在地上
     }
 
     findWeapon() {
-        if (this.game.gameState.inventory.includes('祭祀 dagger')) {
+        if (this.game.gameState.inventory.includes('仪式匕首')) {
             this.showDialogue('你已经有一把匕首了。', [
                 { text: '阻止献祭', action: () => this.stopSacrifice() }
             ]);
