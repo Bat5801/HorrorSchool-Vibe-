@@ -409,6 +409,7 @@ class SchoolHorrorGame {
             '古老卷轴': '记载着学校历史的古老卷轴，上面的文字已经有些模糊。',
             '水之 artifact': '蓝色的宝石，蕴含着水的力量，刻着神秘符号。',
             '生命 artifact': '绿色的宝石，蕴含着生命的力量，刻着神秘符号。',
+            '火焰 artifact': '红色的宝石，蕴含着火焰的力量，刻着神秘符号。',
         };
 
         this.gameState.inventory.forEach(item => {
@@ -430,8 +431,9 @@ class SchoolHorrorGame {
             else if (item === '矿泉水') icon = '💧';
             else if (item === '纱布') icon = '🩹';
             else if (item === '仪式匕首') icon = '🗡️';
-            else if (item === '水之 artifact') icon = '💧';
-            else if (item === '生命 artifact') icon = '🌿';
+            else if (item === '水之 artifact') icon = '💎🔵';
+            else if (item === '生命 artifact') icon = '💎🟢';
+            else if (item === '火焰 artifact') icon = '💎🔴';
 
             itemElement.innerHTML = `
                 <div class="inventory-item-icon">${icon}</div>

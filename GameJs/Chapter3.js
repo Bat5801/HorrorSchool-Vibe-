@@ -59,6 +59,13 @@ class Chapter3 {
             // 更新物品栏显示
             this.game.updateInventoryDisplay();
         }
+        
+        // 检测是否有徽章，没有则自动添加
+        if (!this.game.gameState.inventory.includes('徽章')) {
+            this.game.gameState.inventory.push('徽章');
+            // 更新物品栏显示
+            this.game.updateInventoryDisplay();
+        }
         this.game.updateGameMap('schoolGate');
         this.plotProgress = 0;
         this.loadScene('schoolGate');
@@ -90,12 +97,84 @@ class Chapter3 {
             case 'friendRoom':
                 this.showFriendRoomScene();
                 break;
+            case 'dormitory':
+                this.showDormitoryScene();
+                break;
             case 'labyrinth':
                 this.showLabyrinthScene();
                 break;
             default:
                 this.showSchoolGateScene();
         }
+    }
+
+     // 宿舍场景
+    showDormitoryScene() {
+        this.game.gameState.currentScene = 'dormitory';
+        this.game.updateGameMap('dormitory');
+        const friendName = this.game.gameState.playerGender === "male" ? "张伟" : "李娜";
+        
+        if (this.friendSaved) {
+            this.showDialogue(`${friendName}在宿舍里来回踱步，看起来很焦虑。"我们接下来该怎么办？学校里的那些东西越来越多了。"`, [
+                { text: '一起探索教学楼', action: () => this.loadScene('foyer') },
+                { text: '调查旧翼楼', action: () => this.loadScene('abandonedWing') }
+            ]);
+        } else {
+            this.showDialogue(`宿舍里空无一人，但你注意到${friendName}的床上有一本打开的日记。日记的最后一页写着："我必须去旧翼楼，那里有真相。"`, [
+                { text: '前往旧翼楼', action: () => this.loadScene('abandonedWing') },
+                { text: '返回学校大门', action: () => this.loadScene('schoolGate') }
+            ]);
+        }
+    }
+
+    // 朋友房间场景
+    showFriendRoomScene() {
+        this.game.gameState.currentScene = 'friendRoom';
+        this.game.updateGameMap('friendRoom');
+        const friendName = this.game.gameState.playerGender === "male" ? "张伟" : "李娜";
+        
+        if (this.friendSaved) {
+            this.showDialogue(`${friendName}的房间很整洁，但空气中弥漫着一股奇怪的气味。书桌上放着一张你们的合照，照片背面写着：'永远的朋友'。`, [
+                { text: '和他/她交谈', action: () => this.talkToFriend() },
+                { text: '离开房间', action: () => this.enterSchool() }
+            ]);
+        } else {
+            this.showDialogue(`这是${friendName}的房间，但里面空无一人。床上的被子凌乱，似乎主人匆忙离开。书桌上有一本日记，最后一页写着：'我看到了红色的眼睛...'`, [
+                { text: '查看日记', action: () => this.readFriendDiary() },
+                { text: '离开房间', action: () => this.enterSchool() }
+            ]);
+        }
+    }
+
+    talkToFriend() {
+        const friendName = this.game.gameState.playerGender === "male" ? "张伟" : "李娜";
+        this.showDialogue(`${friendName}看起来很疲惫："我还是不敢相信发生的一切。那个黑影...它一直在跟着我。"`, [
+            { text: '安慰他/她', action: () => this.comfortFriend() },
+            { text: '一起探索学校', action: () => this.exploreWithFriend() }
+        ]);
+    }
+
+    readFriendDiary() {
+        const friendName = this.game.gameState.playerGender === "male" ? "张伟" : "李娜";
+        this.showDialogue(`日记里记录了${friendName}最近的遭遇："我开始做噩梦，梦见红色的眼睛和黑色的影子。今天我在旧教学楼看到了奇怪的符号，它们好像在召唤什么..."`, [
+            { text: '继续查看', action: () => this.continueReadingDiary() },
+            { text: '离开房间', action: () => this.enterSchool() }
+        ]);
+    }
+
+    comfortFriend() {
+        const friendName = this.game.gameState.playerGender === "male" ? "张伟" : "李娜";
+        this.showDialogue(`${friendName}勉强笑了笑："谢谢你，有你在我感觉好多了。"`, [
+            { text: '一起离开学校', action: () => this.leaveWithFriend() },
+            { text: '一起探索学校', action: () => this.exploreWithFriend() }
+        ]);
+    }
+
+    continueReadingDiary() {
+        const friendName = this.game.gameState.playerGender === "male" ? "张伟" : "李娜";
+        this.showDialogue(`日记的最后几页被撕毁了，只剩下一句话："10月13日，祭坛将再次苏醒..."`, [
+            { text: '离开房间', action: () => this.enterSchool() }
+        ]);
     }
 
     // 学校门口场景
@@ -143,7 +222,7 @@ class Chapter3 {
         this.game.updateGameMap('foyer');
         this.showDialogue('你推开校门，吱呀的声音在寂静的夜里格外刺耳。学校内部的景象与之前不同，走廊里弥漫着红色的雾气，墙上的画像都变成了骷髅头。', [
             { text: '前往教学楼', action: () => this.loadScene('foyer') },
-            { text: '前往宿舍', action: () => this.loadScene('friendRoom') }
+            { text: '前往宿舍', action: () => this.loadScene('dormitory') }
         ]);
     }
 
@@ -530,7 +609,10 @@ ${friendName}倒在地上，昏迷不醒。`, [
                 this.typingInterval = null;
                 // 显示重新开始按钮
                 setTimeout(() => {
-                    this.game.elements.restartBtn.classList.remove('hidden');
+                    // 显示重新开始按钮并绑定事件
+                const restartBtn = this.game.elements.restartGameBtn || document.getElementById('restart-game');
+                restartBtn.classList.remove('hidden');
+                restartBtn.onclick = () => this.game.restartGame();
                 }, 500);
             }
         }, typeSpeed);
