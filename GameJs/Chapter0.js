@@ -25,6 +25,9 @@ class SchoolHorrorGame {
 
         // 时间更新定时器
         this.timeUpdateInterval = null;
+        // 打字机效果定时器
+        this.typingInterval = null;
+        this.mainMenuTypingInterval = null;
 
         // DOM元素
         this.elements = {
@@ -104,7 +107,9 @@ class SchoolHorrorGame {
                     const chapter = item.dataset.chapter;
                     this.startGame(chapter);
                 } else {
-                    alert('你还没有解锁该关卡');
+                    this.showMainMenuDialog('你还没有解锁该关卡', [
+                        { text: '确定', action: () => {} }
+                    ]);
                 }
             });
         });
@@ -561,6 +566,99 @@ class SchoolHorrorGame {
             default:
                 return '■■■■■■■■\n■   ?    ■\n■        ■\n■■■■■■■■';
         }
+    }
+
+    // 主菜单弹窗函数
+    showMainMenuDialog(text, choices) {
+        // 创建背景层
+        const overlay = document.createElement('div');
+        overlay.className = 'dialog-overlay';
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        overlay.style.zIndex = '999';
+        document.body.appendChild(overlay);
+
+        // 创建弹窗容器
+        const dialogContainer = document.createElement('div');
+        dialogContainer.className = 'main-menu-dialog';
+        dialogContainer.style.position = 'fixed';
+        dialogContainer.style.top = '50%';
+        dialogContainer.style.left = '50%';
+        dialogContainer.style.transform = 'translate(-50%, -50%)';
+        dialogContainer.style.width = '400px';
+        dialogContainer.style.backgroundColor = '#2a2a2a';
+        dialogContainer.style.border = '2px solid #ff4d4d';
+        dialogContainer.style.borderRadius = '8px';
+        dialogContainer.style.padding = '1.5rem';
+        dialogContainer.style.zIndex = '1000';
+        dialogContainer.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.8)';
+
+        // 创建文本区域
+        const textElement = document.createElement('div');
+        textElement.className = 'main-menu-dialog-text';
+        textElement.style.color = '#ddd';
+        textElement.style.marginBottom = '1.5rem';
+        textElement.style.minHeight = '60px';
+        textElement.style.fontFamily = 'mplus_hzk_12, monospace';
+
+        // 创建选项区域
+        const choicesElement = document.createElement('div');
+        choicesElement.className = 'main-menu-dialog-choices';
+        choicesElement.style.display = 'flex';
+        choicesElement.style.flexWrap = 'wrap';
+        choicesElement.style.gap = '0.5rem';
+
+        // 添加到容器
+        dialogContainer.appendChild(textElement);
+        dialogContainer.appendChild(choicesElement);
+
+        // 添加到文档
+        document.body.appendChild(dialogContainer);
+
+        // 打字机效果
+        let index = 0;
+        const typeSpeed = 70; // 打字速度，毫秒/字符
+
+        // 清除任何正在进行的打字动画
+        if (this.mainMenuTypingInterval) {
+            clearInterval(this.mainMenuTypingInterval);
+        }
+
+        // 开始打字动画
+        this.mainMenuTypingInterval = setInterval(() => {
+            if (index < text.length) {
+                textElement.textContent += text.charAt(index);
+                index++;
+            } else {
+                clearInterval(this.mainMenuTypingInterval);
+                // 打字完成后显示选项
+                choices.forEach(choice => {
+                    const button = document.createElement('button');
+                    button.className = 'choice-btn';
+                    button.textContent = choice.text;
+                    button.style.padding = '0.5rem 1rem';
+                    button.style.backgroundColor = '#333';
+                    button.style.border = '1px solid #555';
+                    button.style.color = '#fff';
+                    button.style.cursor = 'pointer';
+                    button.style.fontSize = '0.9rem';
+                    button.style.fontFamily = 'mplus_hzk_12, monospace';
+
+                    button.addEventListener('click', () => {
+                        choice.action();
+                        // 移除弹窗和背景层
+                        document.body.removeChild(dialogContainer);
+                        document.body.removeChild(overlay);
+                    });
+
+                    choicesElement.appendChild(button);
+                });
+            }
+        }, typeSpeed);
     }
 
     // 打字机效果显示对话
