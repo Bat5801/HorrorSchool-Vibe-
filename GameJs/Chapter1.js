@@ -9,49 +9,8 @@ class Chapter1 {
 
     // 打字机效果显示对话
     showDialogue(text, choices) {
-        // 保存原始的game.showDialogue方法
-        const originalShowDialogue = this.game.showDialogue;
-        
-        // 重写game.showDialogue方法以实现打字机效果
-        this.game.showDialogue = (text, choices) => {
-            const dialogueText = document.getElementById('dialogue-text') || this.game.elements.dialogueText;
-            const dialogueChoices = document.getElementById('dialogue-choices') || this.game.elements.dialogueChoices;
-            
-            dialogueText.textContent = '';
-            dialogueChoices.innerHTML = '';
-            
-            let index = 0;
-            const typeSpeed = 50; // 打字速度，毫秒/字符
-            
-            // 清除任何正在进行的打字动画
-            if (this.typingInterval) {
-                clearInterval(this.typingInterval);
-            }
-            
-            // 开始打字动画
-            this.typingInterval = setInterval(() => {
-                if (index < text.length) {
-                    dialogueText.textContent += text.charAt(index);
-                    index++;
-                } else {
-                    clearInterval(this.typingInterval);
-                    // 打字完成后显示选项
-                    choices.forEach(choice => {
-                        const button = document.createElement('button');
-                        button.className = 'choice-btn';
-                        button.textContent = choice.text;
-                        button.addEventListener('click', choice.action);
-                        dialogueChoices.appendChild(button);
-                    });
-                }
-            }, typeSpeed);
-        };
-        
-        // 调用重写后的showDialogue方法
+        // 直接使用游戏对象的showDialogue方法
         this.game.showDialogue(text, choices);
-        
-        // 恢复原始的game.showDialogue方法（可选）
-        // this.game.showDialogue = originalShowDialogue;
     }
 
     // 开始第一章

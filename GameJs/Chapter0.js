@@ -597,6 +597,11 @@ class SchoolHorrorGame {
 
     // 清除对话
     clearDialogue() {
+        // 清除任何正在进行的打字动画
+        if (this.typingInterval) {
+            clearInterval(this.typingInterval);
+            this.typingInterval = null;
+        }
         this.elements.dialogueText.textContent = '';
         this.elements.dialogueChoices.innerHTML = '';
     }
