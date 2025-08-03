@@ -23,6 +23,8 @@ class SchoolHorrorGame {
             unlockedChapters: unlockedChapters
         };
 
+        // 移除了自制章节始终解锁的代码，现在自制章节将保持未解锁状态
+
         // 时间更新定时器
         this.timeUpdateInterval = null;
         // 打字机效果定时器
@@ -103,8 +105,13 @@ class SchoolHorrorGame {
         // 章节选择事件
         document.querySelectorAll('.chapter-item').forEach(item => {
             item.addEventListener('click', () => {
-                if (item.classList.contains('available')) {
-                    const chapter = item.dataset.chapter;
+                const chapter = item.dataset.chapter;
+                if (chapter === 'custom') {
+                    // 自制章节特定提示
+                    this.showMainMenuDialog('该功能还在内测中，暂不可用', [
+                        { text: '确定', action: () => {} }
+                    ]);
+                } else if (item.classList.contains('available')) {
                     this.startGame(chapter);
                 } else {
                     this.showMainMenuDialog('你还没有解锁该关卡', [
@@ -187,6 +194,16 @@ class SchoolHorrorGame {
                     this.chapter3.start();
                 } else {
                     this.showDialogue('无法加载第三章内容，请确保Chapter3.js已正确加载。', [
+                        { text: '返回章节选择', action: () => this.returnToChapterSelect() }
+                    ]);
+                }
+            } else if (chapter === 'custom') {
+                // 加载自制章节
+                if (window.CustomChapter) {
+                    this.customChapter = new CustomChapter(this);
+                    this.customChapter.start();
+                } else {
+                    this.showDialogue('无法加载自制章节内容，请确保CustomChapter.js已正确加载。', [
                         { text: '返回章节选择', action: () => this.returnToChapterSelect() }
                     ]);
                 }
