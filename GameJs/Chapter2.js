@@ -237,7 +237,7 @@ ${this.getPronoun('subject')}生气地摔门而出，留下你一个人在宿舍
 
     leaveDormitoryWithFriend() {
         this.game.updateGameMap('quadrangle');
-        this.showDialogue(`${this.friendName}突然停下脚步："等一下...你们有没有听到什么声音？像是...有人在哭？"`, [
+        this.showDialogue(`${this.friendName}突然停下脚步："等一下...你有没有听到什么声音？像是...有人在哭？"`, [
             { text: '前往哭声源头', action: () => this.followCryingSound() },
             { text: '赶紧离开学校', action: () => this.tryEscapeSchool() }
         ]);
